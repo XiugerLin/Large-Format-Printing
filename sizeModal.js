@@ -1,7 +1,11 @@
 // ================================
+// 全局變量
+// ================================
+let selectedSizeButton = null;
+
+// ================================
 // 初始化彈出視窗和事件監聽器
 // ================================
-
 document.addEventListener('DOMContentLoaded', () => {
     initializeSizeModal();
     initializeCollapsibleSections();
@@ -11,12 +15,58 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('confirmButton').addEventListener('click', handleConfirmAction);
 });
 
-let selectedSizeButton = null; // 儲存選擇的尺寸按鈕
+// ================================
+// 初始化彈出視窗
+// ================================
+function initializeSizeModal() {
+    // 當彈出視窗顯示時更新下拉選單
+    document.getElementById('sizeModal').addEventListener('shown.bs.modal', updateGroupSelection);
+
+    // 動態載入所有常用尺寸
+    loadSizes('common-sizes.html');
+}
 
 // ================================
-// 可折疊區塊的初始化及功能
+// 動態載入尺寸
 // ================================
+function loadSizes(url) {
+    fetch(url)
+        .then(response => response.text())
+        .then(html => {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+            
+            // 載入海報尺寸
+            const commonSizes = tempDiv.querySelector('#commonSizes');
+            if (commonSizes) {
+                document.getElementById('commonSizes').innerHTML = commonSizes.innerHTML;
+            }
+            
+            // 載入布條尺寸
+            const bannerSizes = tempDiv.querySelector('#bannerSizes');
+            if (bannerSizes) {
+                document.getElementById('bannerSizes').innerHTML = bannerSizes.innerHTML;
+            }
 
+            // 載入海報展架尺寸
+            const standSizes = tempDiv.querySelector('#standSizes');
+            if (standSizes) {
+                document.getElementById('standSizes').innerHTML = standSizes.innerHTML;
+            }
+            
+            // 重新綁定所有尺寸按鈕事件
+            document.querySelectorAll('.size-option').forEach(button => {
+                button.addEventListener('click', function () {
+                    selectSizeOptionButton(this);
+                });
+            });
+        })
+        .catch(error => console.error('Error loading sizes:', error));
+}
+
+// ================================
+// 初始化可折疊區塊
+// ================================
 function initializeCollapsibleSections() {
     const titles = document.querySelectorAll('.collapsible-title');
 
@@ -35,6 +85,9 @@ function initializeCollapsibleSections() {
     });
 }
 
+// ================================
+// 切換可折疊區塊
+// ================================
 function toggleCollapsibleSection(currentTitle, currentTarget, currentIcon, allTitles) {
     if (!currentTarget.classList.contains('show')) {
         allTitles.forEach(otherTitle => {
@@ -43,55 +96,42 @@ function toggleCollapsibleSection(currentTitle, currentTarget, currentIcon, allT
                 const otherIcon = otherTitle.querySelector('.toggle-icon');
 
                 if (otherTarget.classList.contains('show')) {
-                    bootstrap.Collapse.getInstance(otherTarget).hide(); // 收合其他區塊
-                    updateIcon(otherIcon, 'right'); // 更新箭頭方向
+                    bootstrap.Collapse.getInstance(otherTarget).hide();
+                    updateIcon(otherIcon, 'right');
                 }
             }
         });
 
-        // 展開當前區塊並更改箭頭方向
         bootstrap.Collapse.getOrCreateInstance(currentTarget).show();
         updateIcon(currentIcon, 'down');
     } else {
-        // 收合當前區塊並恢復箭頭方向
         bootstrap.Collapse.getInstance(currentTarget).hide();
         updateIcon(currentIcon, 'right');
     }
 }
 
+// ================================
+// 更新圖標
+// ================================
 function updateIcon(icon, direction) {
     icon.classList.remove('down', 'right');
     icon.classList.add(direction);
 }
 
 // ================================
-// 尺寸選擇彈出視窗的初始化及功能
+// 選擇尺寸按鈕
 // ================================
-
-function initializeSizeModal() {
-    // 當彈出視窗顯示時更新下拉選單
-    document.getElementById('sizeModal').addEventListener('shown.bs.modal', updateGroupSelection);
-
-    // 點擊常用尺寸按鈕時選中按鈕並存儲尺寸
-    document.querySelectorAll('#sizeModal .size-option').forEach(button => {
-        button.addEventListener('click', function () {
-            selectSizeOptionButton(this);
-        });
-    });
-}
-
 function selectSizeOptionButton(button) {
     if (selectedSizeButton) {
-        selectedSizeButton.classList.remove('active'); // 移除之前選中的按鈕樣式
+        selectedSizeButton.classList.remove('active');
     }
-    button.classList.add('active'); // 添加選中樣式
-    selectedSizeButton = button; // 設置當前按鈕為選中狀態
+    button.classList.add('active');
+    selectedSizeButton = button;
 }
 
 // ================================
-// 處理確認按鈕的功能
+// 處理確認按鈕動作
 // ================================
-
 function handleConfirmAction() {
     if (selectedSizeButton) {
         const length = selectedSizeButton.getAttribute('data-length');
@@ -100,17 +140,18 @@ function handleConfirmAction() {
         
         fillSelectedOption(length, width, fillOption);
 
-        // 清除選中的按鈕樣式
         selectedSizeButton.classList.remove('active');
-        selectedSizeButton = null; // 重置選中狀態
+        selectedSizeButton = null;
 
-        // 關閉彈出視窗
         bootstrap.Modal.getInstance(document.getElementById('sizeModal')).hide();
     } else {
-        alert('請先選擇一個常用尺寸！'); // 如果未選擇尺寸，顯示提示訊息
+        alert('請先選擇一個常用尺寸！');
     }
 }
 
+// ================================
+// 填入選擇的尺寸
+// ================================
 function fillSelectedOption(length, width, fillOption) {
     if (fillOption === 'existing') {
         const selectedGroupIndex = document.getElementById('selectGroup').value;
@@ -120,24 +161,39 @@ function fillSelectedOption(length, width, fillOption) {
             selectedGroup.querySelector('.width-input').value = width;
         }
     } else {
-        // 新增一組尺寸並填入
         const dimensionContainer = document.getElementById('dimensionContainer');
         const newDimensionGroup = createDimensionGroup(length, width);
         dimensionContainer.appendChild(newDimensionGroup);
-        updateGroupSelection(); // 更新選擇尺寸組的下拉選單
-        updateDimensionNumbers(); // 更新尺寸組編號
+        updateGroupSelection();
+        updateDimensionNumbers();
     }
 }
 
 // ================================
-// 更新選擇尺寸組的下拉選單
+// 創建新的尺寸組
 // ================================
+function createDimensionGroup(length = '', width = '') {
+    const group = document.createElement('div');
+    group.className = 'dimension-group mb-3 d-flex align-items-center';
 
+    group.innerHTML = `
+        <span class="dimension-number"></span>
+        <input type="number" class="form-control length-input" placeholder="長度 (cm)" value="${length}" required step="0.1" min="0.1">
+        <input type="number" class="form-control width-input" placeholder="寬度 (cm)" value="${width}" required step="0.1" min="0.1">
+        <input type="number" class="form-control quantity-input" placeholder="數量" required min="1">
+        <button type="button" class="btn btn-danger btn-remove-dimension"><i class="fa fa-trash"></i></button>
+    `;
+
+    return group;
+}
+
+// ================================
+// 更新尺寸組選擇
+// ================================
 function updateGroupSelection() {
     const selectGroup = document.getElementById('selectGroup');
-    selectGroup.innerHTML = ''; // 清空現有選項
-    const groups = document.querySelectorAll('.dimension-group');
-    groups.forEach((group, index) => {
+    selectGroup.innerHTML = '';
+    document.querySelectorAll('.dimension-group').forEach((group, index) => {
         const option = document.createElement('option');
         option.value = index;
         option.textContent = `尺寸組 ${index + 1}`;
@@ -146,9 +202,20 @@ function updateGroupSelection() {
 }
 
 // ================================
-// 初始化 Radio 按鈕的監聽器
+// 更新尺寸組編號
 // ================================
+function updateDimensionNumbers() {
+    document.querySelectorAll('.dimension-group').forEach((group, index) => {
+        const numberSpan = group.querySelector('.dimension-number');
+        if (numberSpan) {
+            numberSpan.textContent = index + 1;
+        }
+    });
+}
 
+// ================================
+// 初始化 Radio 按鈕監聽器
+// ================================
 function initializeRadioButtonListeners() {
     const existingRadio = document.getElementById('fillExisting');
     const addNewRadio = document.getElementById('addNew');
@@ -157,10 +224,12 @@ function initializeRadioButtonListeners() {
     existingRadio.addEventListener('change', () => toggleSelectGroup(existingRadio, selectGroup));
     addNewRadio.addEventListener('change', () => toggleSelectGroup(addNewRadio, selectGroup));
 
-    // 初始狀態檢查
     toggleSelectGroup(existingRadio.checked ? existingRadio : addNewRadio, selectGroup);
 }
 
+// ================================
+// 切換選擇尺寸組下拉選單
+// ================================
 function toggleSelectGroup(radioButton, selectGroup) {
-    selectGroup.disabled = radioButton === document.getElementById('addNew'); // 根據選中的 RadioButton 禁用或啟用下拉式選單
+    selectGroup.disabled = radioButton === document.getElementById('addNew');
 }

@@ -122,7 +122,7 @@
                 ? calculateAmountWithTrim(dimension.length, dimension.width, dimension.quantity, material, materialPrice, materialDiscountPrice)
                 : calculateAmount(dimension.length, dimension.width, dimension.quantity, material, materialPrice, materialDiscountPrice);
     
-            addRowToTable(material, dimension, totalAmount);
+            addRowToTable(material, dimension, totalAmount, isTrimChecked);
         });
     
         updateAllRowsInTable();
@@ -147,7 +147,7 @@
     // 輔助函數：計算材質面積總和
     // ================================
     const updateMaterialAreaSums = (material, length, width, quantity, isTrimChecked) => {
-        const area = isTrimChecked ? length * width * quantity : Math.ceil((length * width) / 900) * quantity;
+        const area = isTrimChecked ? (length * width * quantity) / 900 : Math.ceil((length * width) / 900) * quantity;
         materialAreaSums[material] = (materialAreaSums[material] || 0) + area;
     };
 
@@ -174,8 +174,8 @@
     };
 
     const calculateAmountWithTrim = (length, width, quantity, material, pricePerUnit, discountPricePerUnit) => {
-        const area = length * width * quantity;
-        const unitPrice = materialAreaSums[material] >= 100 ? discountPricePerUnit : pricePerUnit;
+        const area = (length * width * quantity);
+        const unitPrice = (materialAreaSums[material] >= 100 ? discountPricePerUnit : pricePerUnit) + 20;
         return (unitPrice * Math.ceil(area / 900)).toFixed(0);
     };
 
@@ -190,13 +190,14 @@
     // ================================
     // 表格操作函數
     // ================================
-    const addRowToTable = (material, dimension, totalAmount) => {
+    const addRowToTable = (material, dimension, totalAmount, isTrimChecked) => {
         const tableBody = document.getElementById('resultTable').querySelector('tbody');
         const newRow = document.createElement('tr');
         const unitPrice = calculateUnitPrice(totalAmount, dimension.quantity);
+        const materialName = isTrimChecked ? material + "+裁小模" : material;
     
         newRow.innerHTML = `
-            <td>${material}</td>
+            <td>${materialName}</td>
             <td>${dimension.length}x${dimension.width}cm</td>
             <td>${dimension.quantity}</td>
             <td class="unit-price">${unitPrice}</td>
@@ -222,10 +223,10 @@
         const materialTotals = {};
 
         rows.forEach(row => {
-            const material = row.children[0].textContent;
+            const material = row.children[0].textContent.replace("+裁小模", "");
             const dimensions = row.children[1].textContent.split('x').map(parseFloat);
             const quantity = parseInt(row.children[2].textContent);
-            const isTrimChecked = document.getElementById('trimCheckbox').checked;
+            const isTrimChecked = row.children[0].textContent.includes("+裁小模");
 
             const materialPrice = getMaterialPrice(material);
             const materialDiscountPrice = getMaterialPrice(material, true);
@@ -246,7 +247,7 @@
         });
 
         rows.forEach(row => {
-            const material = row.children[0].textContent;
+            const material = row.children[0].textContent.replace("+裁小模", "");
             const totalCell = row.children[4];
             const tooltipIcon = totalCell.querySelector('.tooltip-icon');
 
