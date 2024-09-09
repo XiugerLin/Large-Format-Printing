@@ -58,6 +58,7 @@ function loadSizes(url) {
             document.querySelectorAll('.size-option').forEach(button => {
                 button.addEventListener('click', function () {
                     selectSizeOptionButton(this);
+                    scrollToSizeOptions();
                 });
             });
         })
@@ -127,6 +128,16 @@ function selectSizeOptionButton(button) {
     }
     button.classList.add('active');
     selectedSizeButton = button;
+}
+
+// ================================
+// 滾動到尺寸選項
+// ================================
+function scrollToSizeOptions() {
+    const sizeOptionsSection = document.querySelector('.mb-3:has(#selectGroup)');
+    if (sizeOptionsSection) {
+        sizeOptionsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 }
 
 // ================================

@@ -28,15 +28,16 @@
     --button-text-color: #ffffff;
 }
 
-/* ==================== 基本樣式 ==================== */
+/* 全局樣式 */
 body {
     background-color: var(--table-bg-color);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #333;
-    animation: fadeIn 0.5s ease-out; /* 網頁初始化時的淡入效果 */
+    animation: fadeIn 0.5s ease-out;
     min-width: 400px;
 }
 
+/* 表單樣式 */
 .custom-form {
     background-color: var(--main-bg-color);
     padding: 30px;
@@ -57,7 +58,7 @@ body {
     padding-bottom: 10px;
 }
 
-/* ==================== 表單標籤樣式 ==================== */
+/* 表單元素樣式 */
 .custom-form .form-label {
     display: block;
     font-weight: bold;
@@ -66,14 +67,13 @@ body {
     margin-bottom: 0.75rem;
 }
 
-/* ==================== 表單控制項樣式 ==================== */
 .custom-form .form-control,
 .custom-form .form-select,
 .custom-form .ts-control {
     height: 50px;
     border-radius: 10px;
     border: 2px solid var(--input-border-color);
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    transition: all 0.3s ease;
     padding-left: 20px;
     font-size: 1rem;
     background-color: var(--input-bg-color);
@@ -82,7 +82,6 @@ body {
     box-sizing: border-box;
 }
 
-/* ==================== 材質選擇框樣式 ==================== */
 .custom-form .ts-control {
     display: flex;
     align-items: center;
@@ -96,7 +95,7 @@ body {
     justify-content: center;
     color: black;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    transition: all 0.3s ease;
 }
 
 .custom-form .ts-control .clear-button:hover {
@@ -104,10 +103,10 @@ body {
     color: var(--btn-danger-bg);
 }
 
-/* 美化裁小模 checkbox 的樣式 */
+/* 複選框樣式 */
 .custom-form .form-check {
     display: flex;
-    align-items: center; /* 垂直置中 */
+    align-items: center;
     margin-left: var(--content-indent);
     margin-top: 10px;
 }
@@ -119,7 +118,7 @@ body {
     border-radius: 4px;
     background-color: var(--input-bg-color);
     transition: all 0.3s ease;
-    margin-right: 10px; /* 與標籤之間的間距 */
+    margin-right: 10px;
 }
 
 .custom-form .form-check-input:checked {
@@ -136,11 +135,10 @@ body {
     color: var(--primary-color);
     font-size: 1rem;
     user-select: none;
-    margin-bottom: 0; /* 避免標籤有額外的間距 */
+    margin-bottom: 0;
 }
 
-
-/* ==================== 尺寸組樣式 ==================== */
+/* 尺寸組樣式 */
 .custom-form .dimension-group .form-control {
     margin: 0px 10px;
 }
@@ -153,7 +151,6 @@ body {
     scrollbar-color: var(--btn-primary-bg) #fff5e1;
 }
 
-/* 自訂滾動條樣式 */
 .custom-form .dimension-container::-webkit-scrollbar {
     width: 12px;
     background-color: #fff5e1;
@@ -170,116 +167,103 @@ body {
     background-color: var(--btn-primary-hover-bg);
 }
 
-/* 尺寸組數字樣式 */
 .custom-form .dimension-number {
     font-size: 1.25rem;
     font-weight: bold;
     color: var(--dimension-number-color);
 }
 
-/* ==================== 按鈕樣式 ==================== */
+/* 按鈕樣式 */
+.custom-form .btn {
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    box-shadow: 0 4px 8px var(--shadow-color);
+    transition: all 0.3s ease;
+}
 
-/* 常用尺寸按鈕 */
+.custom-form .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.custom-form .btn:active {
+    transform: translateY(0);
+}
+
 .custom-form .btn-info {
     background-color: var(--modal-btn-bg-color);
     color: var(--button-text-color);
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
-    padding: 8px 16px;
-    box-shadow: 0 4px 8px var(--shadow-color);
-    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
 
-.custom-form .btn-info:hover {
-    background-color: var(--modal-option-hover-bg-color);
-    color: var(--button-text-color);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px var(--shadow-color);
-}
-
+.custom-form .btn-info:hover,
 .custom-form .btn-info:active {
     background-color: var(--modal-option-hover-bg-color);
-    color: var(--button-text-color);
-    transform: translateY(0);
-    box-shadow: 0 8px 16px var(--shadow-color);
 }
 
-/* 新增尺寸組按鈕 */
 .custom-form .btn-add-dimension {
     background-color: var(--btn-add-dimension-bg);
     color: var(--button-text-color);
-    border: none;
-    font-weight: bold;
-    border-radius: 8px;
-    padding: 8px 16px;
-    box-shadow: 0 4px 8px var(--shadow-color);
-    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
 
-.custom-form .btn-add-dimension:hover {
-    background-color: var(--btn-add-dimension-hover-bg);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-}
-
+.custom-form .btn-add-dimension:hover,
 .custom-form .btn-add-dimension:active {
     background-color: var(--btn-add-dimension-hover-bg);
-    transform: translateY(0);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-}
-
-/* 刪除尺寸組按鈕 */
-.form-footer .btn-reset,
-.form-footer .btn-submit {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.2rem;
-    transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .form-footer .btn-reset {
     background-color: var(--btn-reset-bg);
     color: black;
-    font-weight: bold;
 }
 
-.form-footer .btn-reset:hover {
-    background-color: var(--btn-reset-hover-bg);
-    color: var(--button-text-color);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-}
-
+.form-footer .btn-reset:hover,
 .form-footer .btn-reset:active {
     background-color: var(--btn-reset-hover-bg);
     color: var(--button-text-color);
-    transform: translateY(0);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
-/* 提交按鈕 */
+
 .form-footer .btn-submit {
     background-color: var(--btn-primary-bg);
     color: var(--button-text-color);
-    font-weight: bold;
 }
 
-.form-footer .btn-submit:hover {
-    background-color: var(--btn-primary-hover-bg);
-    color: var(--button-text-color);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-}
-
+.form-footer .btn-submit:hover,
 .form-footer .btn-submit:active {
     background-color: var(--btn-primary-hover-bg);
-    color: var(--button-text-color);
-    transform: translateY(0);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+/* 輸出清單標題樣式 */
+.output-list-header {
+    font-size: 2rem;
+    color: var(--primary-color);
+    text-align: center;
+    margin: 40px 0 20px;
+    padding-bottom: 10px;
+    position: relative;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
 }
 
-/* ==================== 表格樣式 ==================== */
+.output-list-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 4px;
+    background: linear-gradient(to right, var(--secondary-color), var(--primary-color));
+    border-radius: 2px;
+}
+
+.output-list-header::before {
+    content: '📋';
+    font-size: 1.5rem;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+/* 表格樣式 */
 .output-list-table {
     width: 100%;
     border-collapse: collapse;
@@ -298,10 +282,8 @@ body {
     padding: 5px;
     font-size: 1.2rem;
     font-weight: bold;
-
 }
 
-/* 表格單元格樣式 */
 .output-list-table th,
 .output-list-table td {
     border-top: 1px solid #ddd;
@@ -312,76 +294,71 @@ body {
     color: #333;
     background-color: var(--table-bg-color);
     font-size: 1rem;
-    word-wrap: break-word; /* 內容超出範圍時換行 */
+    word-wrap: break-word;
 }
-/* 設定欄位寬度比例 */
+
 .output-list-table th:nth-child(1),
-.output-list-table td:nth-child(1) { width: 45%; } /* 材質 */
+.output-list-table td:nth-child(1) { width: 45%; }
 .output-list-table th:nth-child(2),
-.output-list-table td:nth-child(2) { width: 15%; } /* 尺寸 */
+.output-list-table td:nth-child(2) { width: 15%; }
 .output-list-table th:nth-child(3),
-.output-list-table td:nth-child(3) { width: 10%; } /* 數量 */
+.output-list-table td:nth-child(3) { width: 10%; }
 .output-list-table th:nth-child(4),
-.output-list-table td:nth-child(4) { width: 10%; } /* 單價 */
+.output-list-table td:nth-child(4) { width: 10%; }
 .output-list-table th:nth-child(5),
-.output-list-table td:nth-child(5) { width: 10%; } /* 金額 */
+.output-list-table td:nth-child(5) { width: 10%; }
 .output-list-table th:nth-child(6),
-.output-list-table td:nth-child(6) { width: 10%; } /* 操作 */
+.output-list-table td:nth-child(6) { width: 10%; }
 
-
-/* 表格行樣式 */
 .output-list-table tbody tr {
     transition: background-color 0.3s ease;
 }
 
 .output-list-table tbody > tr:nth-child(even) > td {
-    background-color: var(--table-even-row-bg-color) !important;
+    background-color: var(--table-even-row-bg-color);
 }
 
 .output-list-table tbody > tr:nth-child(odd) > td {
-    background-color: var(--table-odd-row-bg-color) !important;
+    background-color: var(--table-odd-row-bg-color);
 }
 
 .output-list-table tbody > tr:hover > td {
-    background-color: var(--table-hover-bg-color) !important;
+    background-color: var(--table-hover-bg-color);
 }
 
-/* 自定義 Tooltip 樣式 */
+/* Tooltip 樣式 */
 .custom-tooltip {
-    background-color: #dc3545 !important; /* 紅色背景並強制覆蓋 */
-    color: #fff !important; /* 白色字體並強制覆蓋 */
-    font-size: 0.8rem; /* 字體大小略微縮小 */
-    font-weight: bold; /* 粗體顯示 */
-    padding: 4px 8px; /* 增加內邊距 */
-    border-radius: 8px; /* 圓角 */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 添加陰影 */
-    max-width: 150px; /* 最大寬度 */
-    text-align: center; /* 文字居中 */
-    opacity: 1; /* 完全不透明 */
-    border: none; /* 移除邊框 */
+    background-color: #dc3545 !important;
+    color: #fff !important;
+    font-size: 0.8rem;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 150px;
+    text-align: center;
+    opacity: 1;
+    border: none;
 }
 
-/* 覆蓋 Tooltip 的內部內容樣式 */
 .custom-tooltip .tooltip-inner {
-    background-color: #dc3545 !important; /* 強制覆蓋內部黑色背景 */
-    color: #fff !important; /* 白色字體 */
-    border-radius: 8px; /* 圓角 */
+    background-color: #dc3545 !important;
+    color: #fff !important;
+    border-radius: 8px;
 }
 
-/* 自定義 Tooltip 箭頭樣式 */
 .custom-tooltip .tooltip-arrow::before {
-    border-color: #dc3545 transparent transparent transparent !important; /* 紅色箭頭並強制覆蓋 */
+    border-color: #dc3545 transparent transparent transparent !important;
 }
 
-/* 調整提示圖標的樣式 */
 .tooltip-icon {
-    font-size: 1rem; /* 圖標大小 */
-    margin-left: 5px; /* 圖標與文字的間距 */
-    cursor: pointer; /* 鼠標樣式 */
-    display: none; /* 預設隱藏 */
+    font-size: 1rem;
+    margin-left: 5px;
+    cursor: pointer;
+    display: none;
 }
 
-/* ==================== 動畫效果 ==================== */
+/* 動畫效果 */
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -394,19 +371,15 @@ body {
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .fade-in-up {
     animation: fadeInUp 0.8s ease-out;
 }
 
-/* ==================== 手機螢幕適應 ==================== */
+/* 響應式設計 */
 @media (max-width: 576px) {
     .container {
         padding: 0 10px;
@@ -427,7 +400,16 @@ body {
         width: 100%;
         margin: 0 auto;
     }
+
     .custom-form .dimension-group .form-control {
         margin: 10px 10px;
+    }
+
+    .output-list-header {
+        font-size: 1.5rem;
+    }
+    
+    .output-list-header::after {
+        width: 80px;
     }
 }

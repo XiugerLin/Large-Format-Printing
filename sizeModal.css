@@ -213,7 +213,7 @@
    ==================== */
 
 #sizeModal  .form-select {
-    margin-left: var(--content-indent);
+    margin-left: 40px;
     width: 200px;
 }
 
@@ -275,5 +275,22 @@
     .dimension-group .btn-remove-dimension {
         width: 100%;
         text-align: center;
+    }
+
+    /* 使常用尺寸按鈕在手機上一個一行顯示 */
+    #sizeModal .modal-dialog .size-option {
+        display: block;
+        width: calc(100% - var(--content-indent));
+        margin: 10px 0 10px var(--content-indent);
+    }
+
+    /* 調整折疊標題在手機上的顯示 */
+    .collapsible-title {
+        font-size: 1.1rem;
+    }
+
+    /* 調整表單選擇器在手機上的寬度 */
+    #sizeModal .form-select {
+        width: calc(100% - 40px);
     }
 }
