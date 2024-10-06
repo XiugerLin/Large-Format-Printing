@@ -1,5 +1,5 @@
 :root {
-    /* 顏色和樣式變數設定 */
+    /* 顏色設定 */
     --modal-bg-color: #e6f3ff;
     --modal-title-color: #3478c0;
     --modal-text-color: #5a6a73;
@@ -18,127 +18,113 @@
     --modal-shadow-color: rgba(0, 0, 0, 0.15);
     --modal-box-shadow: rgba(0, 0, 0, 0.1);
     --modal-box-shadow-hover: rgba(0, 0, 0, 0.2);
+
+    /* 尺寸設定 */
     --modal-border-radius: 15px;
     --content-indent: 20px;
+    --modal-padding: 20px;
+    --modal-title-font-size: 1.5rem;
+    --modal-label-font-size: 1.2rem;
+    --modal-option-font-size: 0.9rem;
+    --modal-option-width: 150px;
+    --modal-option-height: 40px;
+    --modal-scrollbar-width: 8px;
+    --modal-max-height: 400px;
 }
 
-/* ====================
-   彈出視窗樣式設置
-   ==================== */
-
-/* 彈出視窗容器 */
-#sizeModal .modal-dialog .modal-content {
+/* 彈出視窗樣式 */
+#sizeModal .modal-content {
     background-color: var(--modal-bg-color);
     border-radius: var(--modal-border-radius);
     box-shadow: 0 8px 16px var(--modal-shadow-color);
     border: none;
-    padding: 20px;
+    padding: var(--modal-padding);
     color: var(--modal-text-color);
     animation: modalSlideIn 0.5s ease-out;
 }
 
-/* 彈出視窗標題區域 */
-#sizeModal .modal-dialog .modal-header {
-    display: flex;
+#sizeModal .modal-header {
     justify-content: center;
     align-items: center;
     padding: 0 10px 15px;
     position: relative;
     margin-bottom: 15px;
     border-bottom: 3px solid var(--modal-input-border-color);
+    background-color: transparent; /* 確保背景是透明的 */
 }
 
-#sizeModal .modal-dialog .modal-title {
+#sizeModal .modal-title {
     margin: 0;
     flex-grow: 1;
     text-align: center;
     color: var(--modal-title-color);
     font-weight: bold;
-    font-size: 1.5rem;
+    font-size: var(--modal-title-font-size);
     text-shadow: 1px 1px var(--modal-close-btn-color);
 }
 
-/* 表單標籤 */
-#sizeModal .modal-dialog .form-label {
-    font-weight: bold;
-    color: var(--modal-label-color);
-    font-size: 1.2rem;
-}
-
-/* 關閉按鈕 */
-#sizeModal .modal-dialog .btn-close {
+#sizeModal .btn-close {
     position: absolute;
     right: 10px;
     background-color: transparent;
     color: var(--modal-title-color);
     border: none;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
     width: 32px;
     height: 32px;
 }
 
-#sizeModal .modal-dialog .btn-close:hover {
+#sizeModal .btn-close:hover {
     transform: scale(1.2);
     color: var(--modal-close-btn-color);
 }
 
-/* 彈出視窗的正文區域 */
-#sizeModal .modal-dialog .modal-body {
+#sizeModal .modal-body {
     padding: 15px;
-    max-height: 400px;
-    overflow-y: auto; /* 垂直滾動條 */
-    scrollbar-width: thin; /* Firefox 滾動條寬度 */
+    max-height: var(--modal-max-height);
+    overflow-y: auto;
+    scrollbar-width: thin;
     scrollbar-color: var(--modal-option-hover-bg-color) var(--modal-input-bg-color);
 }
 
-/* 自訂滾動條樣式 */
-#sizeModal .modal-dialog .modal-body::-webkit-scrollbar {
-    width: 8px;
-    background-color: var(--modal-input-bg-color);
-    border-radius: 8px;
+#sizeModal .modal-footer {
+    padding: 15px 0 0;
 }
 
-#sizeModal .modal-dialog .modal-body::-webkit-scrollbar-thumb {
+#sizeModal .modal-footer .btn-primary {
+    background-color: var(--modal-btn-bg-color);
+    color: var(--modal-btn-text-color);
+    border: none;
+    transition: all 0.3s ease;
+    padding: 10px 20px;
+    box-shadow: 0 4px 8px var(--modal-shadow-color);
+}
+
+#sizeModal .modal-body::-webkit-scrollbar {
+    width: var(--modal-scrollbar-width);
+    background-color: var(--modal-input-bg-color);
+    border-radius: calc(var(--modal-scrollbar-width) / 2);
+}
+
+#sizeModal .modal-body::-webkit-scrollbar-thumb {
     background-color: var(--modal-option-hover-bg-color);
-    border-radius: 8px;
+    border-radius: calc(var(--modal-scrollbar-width) / 2);
     border: 2px solid var(--modal-input-bg-color);
     box-shadow: 0 0 4px var(--modal-shadow-color);
 }
 
-#sizeModal .modal-dialog .modal-body::-webkit-scrollbar-thumb:hover {
+#sizeModal .modal-body::-webkit-scrollbar-thumb:hover {
     background-color: var(--modal-btn-hover-bg-color);
 }
 
-#sizeModal .modal-dialog .modal-body::-webkit-scrollbar-track {
-    background-color: var(--modal-input-bg-color);
-    border-radius: 8px;
-}
-
-/* 彈出視窗的底部樣式 */
-#sizeModal .modal-dialog .modal-footer {
+#sizeModal .modal-footer {
     padding: 15px 0 0;
 }
 
-/* 彈出視窗的動畫效果 */
-@keyframes modalSlideIn {
-    from {
-        transform: translateY(-50px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-/* ====================
-   可折疊區塊樣式設置
-   ==================== */
-
-/* 折疊標題 */
+/* 可折疊區塊樣式 */
 .collapsible-title {
     cursor: pointer;
-    font-size: 1.25rem;
+    font-size: var(--modal-label-font-size);
     font-weight: bold;
     color: var(--modal-label-color);
     margin-bottom: 0.5rem;
@@ -151,33 +137,28 @@
     color: var(--modal-option-hover-bg-color);
 }
 
-/* 標題中的箭頭圖標 */
 .toggle-icon {
     transition: transform 0.3s ease;
     font-size: 1rem;
-    transform: rotate(0deg); /* 預設箭頭方向 */
+    transform: rotate(0deg);
 }
 
 .toggle-icon.down {
-    transform: rotate(90deg); /* 展開箭頭方向 */
+    transform: rotate(90deg);
 }
 
 .collapsible-title:hover .toggle-icon {
-    transform: rotate(90deg); /* 懸停箭頭旋轉 */
+    transform: rotate(90deg);
 }
 
-/* 標題下方內容縮排 */
-#sizeModal .modal-dialog .content-indent {
+.content-indent {
     margin-left: var(--content-indent);
     margin-bottom: 10px;
 }
 
-/* ====================
-   尺寸選擇按鈕樣式設置
-   ==================== */
-
-#sizeModal .modal-dialog .size-option {
-    margin: 10px 0;
+/* 尺寸選擇按鈕樣式 */
+#sizeModal .size-option {
+    margin: 10px 0 10px var(--content-indent);
     padding: 6px 10px;
     background-color: var(--modal-option-bg-color);
     border: none;
@@ -186,110 +167,98 @@
     font-weight: bold;
     transition: all 0.3s ease;
     box-shadow: 0 4px 8px var(--modal-box-shadow);
-    margin-left: var(--content-indent);
-    font-size: 0.9rem;
-    width: 150px;
-    height: 40px;
+    font-size: var(--modal-option-font-size);
+    width: var(--modal-option-width);
+    height: var(--modal-option-height);
     display: inline-block;
     text-align: center;
     vertical-align: middle;
 }
 
-#sizeModal .modal-dialog .size-option:hover {
+#sizeModal .size-option:hover,
+#sizeModal .size-option.active {
     background-color: var(--modal-option-hover-bg-color);
     color: var(--modal-btn-text-color);
     transform: translateY(-2px);
     box-shadow: 0 8px 16px var(--modal-box-shadow-hover);
 }
 
-#sizeModal .modal-dialog .size-option.active {
-    background-color: var(--modal-btn-hover-bg-color);
-    color: var(--modal-btn-text-color);
-    transform: translateY(-2px);
-}
-
-/* ====================
-   其他元素的樣式設置
-   ==================== */
-
-#sizeModal  .form-select {
+/* 其他元素樣式 */
+#sizeModal .form-select {
     margin-left: 40px;
     width: 200px;
 }
 
-/* 表單選項縮排 */
 #sizeModal .form-check {
-    margin-left: var(--content-indent); 
+    margin-left: var(--content-indent);
 }
 
-/* 分隔線樣式 */
 #sizeModal .modal-divider {
     border-top: 2px solid var(--modal-btn-hover-bg-color);
     margin: 15px 0;
 }
 
-/* 確認按鈕樣式 */
-#sizeModal .modal-dialog .modal-footer .btn-primary {
+#sizeModal .modal-footer .btn-primary {
     background-color: var(--modal-btn-bg-color);
     color: var(--modal-btn-text-color);
     border: none;
-    transition: background-color 0.3s ease, transform 0.3s ease;
+    transition: all 0.3s ease;
     padding: 10px 20px;
     box-shadow: 0 4px 8px var(--modal-shadow-color);
 }
 
-#sizeModal .modal-dialog .modal-footer .btn-primary:hover {
+#sizeModal .modal-footer .btn-primary:hover {
     background-color: var(--modal-btn-hover-bg-color);
     transform: translateY(-2px);
     box-shadow: 0 8px 16px var(--modal-box-shadow-hover);
 }
 
-/* ====================
-   手機適應樣式設置
-   ==================== */
+/* 動畫效果 */
+@keyframes modalSlideIn {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* 響應式設計 */
 @media (max-width: 576px) {
-    #sizeModal .modal-dialog .modal-content {
+    #sizeModal .modal-content {
         padding: 10px;
         max-width: 100%;
     }
 
-    #sizeModal .modal-dialog .modal-body {
+    #sizeModal .modal-body {
         padding: 10px;
     }
 
-    .btn {
+    #sizeModal .btn {
         padding: 8px 12px;
         font-size: 1rem;
     }
 
-    .dimension-group {
+    #sizeModal .dimension-group {
         flex-direction: column;
         align-items: flex-start;
     }
 
-    .dimension-group input {
+    #sizeModal .dimension-group input {
         width: 100%;
         margin-bottom: 10px;
     }
 
-    .dimension-group .btn-remove-dimension {
+    #sizeModal .dimension-group .btn-remove-dimension {
         width: 100%;
         text-align: center;
     }
 
-    /* 使常用尺寸按鈕在手機上一個一行顯示 */
-    #sizeModal .modal-dialog .size-option {
+    #sizeModal .size-option {
         display: block;
         width: calc(100% - var(--content-indent));
-        margin: 10px 0 10px var(--content-indent);
     }
 
-    /* 調整折疊標題在手機上的顯示 */
-    .collapsible-title {
+    #sizeModal .collapsible-title {
         font-size: 1.1rem;
     }
 
-    /* 調整表單選擇器在手機上的寬度 */
     #sizeModal .form-select {
         width: calc(100% - 40px);
     }
