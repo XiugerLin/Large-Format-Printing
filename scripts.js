@@ -312,48 +312,48 @@
     // ===== 表單提交模組 =====
     function handleFormSubmission(event) {
         event.preventDefault();
-
+    
         const material = document.querySelector('.material-select-input').value;
-
+    
         if (!material) {
             alert('請選擇有效的材質！');
             return;
         }
-
+    
         let materialPrice = getMaterialPrice(material);
         let materialDiscountPrice = getMaterialPrice(material, true);
-
+    
         if (materialPrice === 0) {
-            const userPrice = prompt(`請為自定義材質 "${material}" 輸入單價：`);
-            if (userPrice === null || isNaN(userPrice) || userPrice <= 0) {
-                alert('請輸入有效的價格！');
-                return;
-            }
-            materialPrice = parseFloat(userPrice);
-            materialDiscountPrice = materialPrice * 0.9; // 假設折扣價為原價的90%
+            alert(`錯誤：無效的材質 "${material}"。請選擇下拉式選單中的材質。`);
+            return;
         }
-
+    
         const dimensions = getDimensions();
         if (!validateDimensions(dimensions)) {
             alert('請填寫有效的尺寸和數量！');
             return;
         }
-
+    
+        if (dimensions.length === 0) {
+            alert('請至少添加一組尺寸和數量！');
+            return;
+        }
+    
         const isTrimChecked = document.getElementById('trimCheckbox').checked;
         const isSpecialCutting = material.includes("裁小模") || material.includes("輪廓裁型") || material.includes("合成板裁型");
-
+    
         const tableBody = document.getElementById('resultTable').querySelector('tbody');
         const initialRowCount = tableBody.children.length;
-
+    
         dimensions.forEach(dimension => {
             updateMaterialAreaSums(material, dimension.length, dimension.width, dimension.quantity, isSpecialCutting || isTrimChecked);
             const totalAmount = calculateAmount(dimension.length, dimension.width, dimension.quantity, material, materialPrice, materialDiscountPrice, isTrimChecked);
             addRowToTable(material, dimension, totalAmount, isTrimChecked);
         });
-
+    
         updateAllRowsInTable();
         resetForm();
-
+    
         if (tableBody.children.length > initialRowCount) {
             const lastAddedRow = tableBody.children[tableBody.children.length - 1];
             setTimeout(() => {
@@ -390,15 +390,24 @@
 
     function getMaterialPrice(materialName, isDiscount = false) {
         const material = materialsData.find(mat => mat.name === materialName);
-        return material ? (isDiscount ? material.discount_price : material.price) : 0;
+        if (!material) {
+            return 0; // 如果材質不存在，返回 0
+        }
+        return isDiscount ? material.discount_price : material.price;
     }
 
     function calculateAmount(length, width, quantity, material, pricePerUnit, discountPricePerUnit, isTrimChecked) {
         const baseMaterial = getBaseMaterialName(material);
-        const isSpecialCutting = material.includes("裁小模") || material.includes("輪廓裁型") || material.includes("合成板裁型") || isTrimChecked;
-        const area = calculateArea(length, width, quantity, isSpecialCutting);
-        const unitPrice = materialAreaSums[baseMaterial] >= 100 ? discountPricePerUnit : pricePerUnit;
-        const additionalFee = isTrimChecked && !material.includes("裁小模") ? 20 : 0;
+        const isSpecialCutting = material.includes("裁小模") || material.includes("輪廓裁型") || material.includes("合成板裁型");
+        const area = calculateArea(length, width, quantity, isSpecialCutting || isTrimChecked);
+        const isDiscounted = materialAreaSums[baseMaterial] >= 100;
+        const unitPrice = isDiscounted ? discountPricePerUnit : pricePerUnit;
+        let additionalFee = 0;
+        
+        if (isTrimChecked && !material.includes("裁小模")) {
+            additionalFee = isDiscounted ? 18 : 20;
+        }
+        
         return ((unitPrice + additionalFee) * area).toFixed(0);
     }
 
@@ -663,6 +672,12 @@
     function handleRemarksSubmission(event) {
         event.preventDefault();
         try {
+            const tableRows = document.querySelectorAll('#resultTable tbody tr');
+            if (tableRows.length === 0) {
+                alert('輸出清單目前沒有內容。請先添加項目到清單中。');
+                return;
+            }
+    
             const outputContent = generateOutputContent();
             const remarksContent = generateRemarksContent();
             showOutputModal(outputContent, remarksContent);
@@ -697,20 +712,33 @@
     function generateOutputContent() {
         const rows = document.querySelectorAll('#resultTable tbody tr');
         let content = '';
+        let subtotal = 0;
+    
         rows.forEach((row, index) => {
             const material = row.cells[0].textContent;
             const size = row.cells[1].textContent;
             const quantity = row.cells[2].textContent;
             const unitPrice = row.cells[3].textContent;
-            const amount = row.cells[4].textContent;
-
+            const amount = parseFloat(row.cells[4].textContent.replace('$', '').trim());
+    
             content += `${index + 1}.\n`;
             content += `材質:${material}\n`;
             content += `尺寸:${size}\n`;
             content += `數量:${quantity}\n`;
             content += `單價:$${unitPrice}\n`;
             content += `金額:$${amount}\n\n`;
+    
+            subtotal += amount;
         });
+    
+        const taxRate = 0.05; // 5% 稅率
+        const tax = subtotal * taxRate;
+        const total = subtotal + tax;
+        content += `------------------------\n`;
+        content += `合計: $${subtotal.toFixed(0)}\n`;
+        content += `稅金 (5%): $${tax.toFixed(0)}\n`;
+        content += `總計: $${total.toFixed(0)}\n\n`;
+    
         return content;
     }
 

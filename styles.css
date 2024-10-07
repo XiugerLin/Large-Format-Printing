@@ -367,11 +367,19 @@ body {
 .disclaimer-text {
     color: red;
     font-weight: bold;
-    margin-top: 0px;
-    margin-bottom: 0px;
+    margin: 0px;
     text-align: right;
     font-size: 1em;
     padding-right: 15px; /* 與總金額對齊 */
+}
+.price-disclaimer {
+    color: red;
+    padding: 5px;
+    text-align: center;
+    font-weight: bold;
+    border-top: 1px solid #dee2e6;
+    font-size: 1rem;
+    background-color: #fff3f3;
 }
 /* ===== 7. 提示工具樣式 ===== */
 .custom-tooltip,
@@ -392,38 +400,58 @@ body {
 
 .custom-tooltip .tooltip-inner,
 .tooltip .tooltip-inner {
-    background-color: var(--btn-danger-bg) !important;
+    background-color: inherit !important;
     color: #ffffff;
     font-weight: bold;
 }
 
 .custom-tooltip .tooltip-arrow::before,
 .tooltip .tooltip-arrow::before {
-    border-top-color: var(--btn-danger-bg) !important;
-    border-bottom-color: var(--btn-danger-bg) !important;
-    border-left-color: var(--btn-danger-bg) !important;
-    border-right-color: var(--btn-danger-bg) !important;
+    border-top-color: inherit !important;
+    border-bottom-color: inherit !important;
+    border-left-color: inherit !important;
+    border-right-color: inherit !important;
+}
+
+/* 紅色 tooltip 樣式 */
+.tooltip-icon.text-danger + .tooltip .tooltip-inner,
+.tooltip-icon.text-danger + .tooltip .tooltip-arrow::before {
+    background-color: red !important; /* 保持紅色警告 */
 }
 
 /* 確保在所有方向上箭頭顏色一致 */
 .custom-tooltip.bs-tooltip-top .tooltip-arrow::before,
 .tooltip.bs-tooltip-top .tooltip-arrow::before {
-    border-top-color: var(--btn-danger-bg) !important;
+    border-top-color: inherit;
 }
 
 .custom-tooltip.bs-tooltip-bottom .tooltip-arrow::before,
 .tooltip.bs-tooltip-bottom .tooltip-arrow::before {
-    border-bottom-color: var(--btn-danger-bg) !important;
+    border-bottom-color: inherit;
 }
 
 .custom-tooltip.bs-tooltip-start .tooltip-arrow::before,
 .tooltip.bs-tooltip-start .tooltip-arrow::before {
-    border-left-color: var(--btn-danger-bg) !important;
+    border-left-color: inherit;
 }
 
 .custom-tooltip.bs-tooltip-end .tooltip-arrow::before,
 .tooltip.bs-tooltip-end .tooltip-arrow::before {
-    border-right-color: var(--btn-danger-bg) !important;
+    border-right-color: inherit;
+}
+
+/* 優惠價 tooltip 特定樣式 */
+.custom-tooltip.discount-tooltip,
+.tooltip.discount-tooltip {
+    background-color: var(--btn-add-dimension-bg) !important;
+}
+
+.custom-tooltip.discount-tooltip .tooltip-arrow::before,
+.tooltip.discount-tooltip .tooltip-arrow::before {
+    border-top-color: var(--btn-add-dimension-bg) !important;
+    border-bottom-color: var(--btn-add-dimension-bg) !important;
+    border-left-color: var(--btn-add-dimension-bg) !important;
+    border-right-color: var(--btn-add-dimension-bg) !important;
 }
 
 /* 更新備註欄中的 tooltip 樣式，包括快遞取件選項 */
