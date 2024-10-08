@@ -903,7 +903,7 @@
     }
 
     function sendToMobileLine(content) {
-        const lineOfficialAccountUrl = 'https://line.me/R/ti/p/@YOUR_LINE_ID';
+        const lineOfficialAccountUrl = 'https://line.me/R/ti/p/@vcprint';
         const encodedMessage = encodeURIComponent(content);
         const url = `${lineOfficialAccountUrl}?${encodedMessage}`;
         
@@ -927,7 +927,7 @@
 
     function generateQRCode() {
         const modalContent = document.getElementById('modalContent').textContent;
-        const lineOfficialAccountUrl = 'https://line.me/R/ti/p/@YOUR_LINE_ID';
+        const lineOfficialAccountUrl = 'https://line.me/R/ti/p/@vcprint';
         const qrCodeContainer = document.getElementById('qrCode');
         qrCodeContainer.innerHTML = ''; // 清除之前的 QR Code
         
