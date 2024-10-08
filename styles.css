@@ -899,30 +899,23 @@ body {
     border-color: #009900;
 }
 
-#sendToLineBtn, #openLineApp, #openLineWeb {
+#sendToLineBtn {
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-#sendToLineBtn::before, #openLineApp::before, #openLineWeb::before {
+#sendToLineBtn::before {
     content: "\f075"; /* Font Awesome 的消息圖標 Unicode */
     font-family: "Font Awesome 5 Free";
     margin-right: 5px;
 }
 
-#lineOptions {
+#qrCodeContainer {
     background-color: #f8f9fa;
     border-radius: 5px;
     padding: 15px;
     margin-top: 15px;
-}
-
-#qrCodeContainer {
-    background-color: white;
-    padding: 10px;
-    border-radius: 5px;
-    display: inline-block;
 }
 
 #qrCode {
