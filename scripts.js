@@ -28,6 +28,7 @@
             initializeSizeModal();
             initializeTooltips();
             updateTotals();
+            initializeLineButtons();
         } catch (error) {
             console.error('初始化過程中發生錯誤:', error);
         }
@@ -701,10 +702,12 @@
 
         modal._element.addEventListener('shown.bs.modal', function () {
             const copyTextBtn = document.getElementById('copyTextBtn');
+            const sendToLineBtn = document.getElementById('sendToLineBtn');
             if (copyTextBtn) {
-                copyTextBtn.addEventListener('click', copyModalContent);
-            } else {
-                console.error('複製按鈕未找到');
+                copyTextBtn.addEventListener('click', () => copyToClipboard(document.getElementById('modalContent').textContent));
+            }
+            if (sendToLineBtn) {
+                sendToLineBtn.addEventListener('click', showLineOptions);
             }
         });
     }
@@ -854,6 +857,84 @@
 
         // 隱藏郵寄/貨運相關欄位
         document.getElementById('shippingDetails').style.display = 'none';
+    }
+
+    function initializeLineButtons() {
+        const sendToLineBtn = document.getElementById('sendToLineBtn');
+        const openLineApp = document.getElementById('openLineApp');
+        const openLineWeb = document.getElementById('openLineWeb');
+        
+        if (sendToLineBtn) {
+            sendToLineBtn.addEventListener('click', showLineOptions);
+        }
+        if (openLineApp) {
+            openLineApp.addEventListener('click', () => sendToOfficialLine('app'));
+        }
+        if (openLineWeb) {
+            openLineWeb.addEventListener('click', () => sendToOfficialLine('web'));
+        }
+    }
+
+    function showLineOptions() {
+        const lineOptions = document.getElementById('lineOptions');
+        lineOptions.style.display = 'block';
+        generateQRCode();
+    }
+
+    function generateQRCode() {
+        const modalContent = document.getElementById('modalContent').textContent;
+        const lineOfficialAccountUrl = 'https://line.me/R/ti/p/@YOUR_LINE_ID';
+        const qrCodeContainer = document.getElementById('qrCode');
+        qrCodeContainer.innerHTML = ''; // 清除之前的 QR Code
+        
+        new QRCode(qrCodeContainer, {
+            text: `${lineOfficialAccountUrl}?${encodeURIComponent(modalContent)}`,
+            width: 128,
+            height: 128
+        });
+    }
+
+    function sendToOfficialLine(method) {
+        const modalContent = document.getElementById('modalContent').textContent;
+        copyToClipboard(modalContent);
+        
+        const lineOfficialAccountUrl = 'https://line.me/R/ti/p/@vcprint';
+        const encodedMessage = encodeURIComponent(modalContent);
+        
+        let url;
+        if (method === 'app') {
+            url = `line://msg/text/?${encodedMessage}`;
+        } else {
+            url = `${lineOfficialAccountUrl}?${encodedMessage}`;
+        }
+        
+        window.open(url, '_blank');
+        
+        alert('內容已複製到剪貼板。如果 LINE 沒有自動打開，請手動打開 LINE 並貼上內容。');
+    }
+
+    function copyToClipboard(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(() => {
+                console.log('文字已成功複製到剪貼板');
+            }).catch(err => {
+                console.error('複製到剪貼板失敗:', err);
+            });
+        } else {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                console.log('文字已成功複製到剪貼板');
+            } catch (err) {
+                console.error('複製到剪貼板失敗:', err);
+            }
+            document.body.removeChild(textArea);
+        }
     }
 
     // 公開需要在全局範圍內訪問的函數

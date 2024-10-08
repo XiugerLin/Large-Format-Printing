@@ -881,7 +881,52 @@ body {
 }
 
 #outputModal .modal-footer {
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+#outputModal .modal-footer .btn {
+    margin: 5px 0;
+}
+
+#outputModal .btn-success {
+    background-color: #00B900;
+    border-color: #00B900;
+}
+
+#outputModal .btn-success:hover {
+    background-color: #009900;
+    border-color: #009900;
+}
+
+#sendToLineBtn, #openLineApp, #openLineWeb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#sendToLineBtn::before, #openLineApp::before, #openLineWeb::before {
+    content: "\f075"; /* Font Awesome 的消息圖標 Unicode */
+    font-family: "Font Awesome 5 Free";
+    margin-right: 5px;
+}
+
+#lineOptions {
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    padding: 15px;
+    margin-top: 15px;
+}
+
+#qrCodeContainer {
+    background-color: white;
+    padding: 10px;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+#qrCode {
+    margin: 0 auto;
 }
 
 #copyTextBtn {
