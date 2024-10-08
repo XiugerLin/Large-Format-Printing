@@ -859,32 +859,55 @@
         document.getElementById('shippingDetails').style.display = 'none';
     }
 
+    function detectDevice() {
+        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        if (/android/i.test(userAgent)) {
+            return 'mobile';
+        }
+        if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+            return 'mobile';
+        }
+        return 'desktop';
+    }
+
     function initializeLineButtons() {
-        console.log('初始化 LINE 按鈕');
         const sendToLineBtn = document.getElementById('sendToLineBtn');
-        const openLineApp = document.getElementById('openLineApp');
-        const openLineWeb = document.getElementById('openLineWeb');
-        
         if (sendToLineBtn) {
-            console.log('找到 sendToLineBtn，添加事件監聽器');
-            sendToLineBtn.addEventListener('click', showLineOptions);
-        } else {
-            console.error('無法找到 sendToLineBtn');
+            sendToLineBtn.addEventListener('click', handleSendToLine);
         }
+    }
+
+    function handleSendToLine() {
+        const deviceType = detectDevice();
+        const modalContent = document.getElementById('modalContent').textContent;
+        copyToClipboard(modalContent);
     
-        if (openLineApp) {
-            console.log('找到 openLineApp，添加事件監聽器');
-            openLineApp.addEventListener('click', () => sendToOfficialLine('app'));
+        if (deviceType === 'desktop') {
+            sendToDesktopLine(modalContent);
         } else {
-            console.error('無法找到 openLineApp');
+            sendToMobileLine(modalContent);
         }
-    
-        if (openLineWeb) {
-            console.log('找到 openLineWeb，添加事件監聽器');
-            openLineWeb.addEventListener('click', () => sendToOfficialLine('web'));
-        } else {
-            console.error('無法找到 openLineWeb');
-        }
+    }
+    function sendToDesktopLine(content) {
+        const lineProtocolUrl = `line://msg/text/?${encodeURIComponent(content)}`;
+        
+        // 嘗試打開桌面版 LINE
+        window.location.href = lineProtocolUrl;
+        
+        // 如果 5 秒後頁面還在，說明可能沒有安裝 LINE 或打開失敗
+        setTimeout(() => {
+            if (!document.hidden) {
+                alert('無法打開桌面版 LINE。請確保您已安裝 LINE，或手動打開 LINE 並貼上已複製的內容。');
+            }
+        }, 5000);
+    }
+
+    function sendToMobileLine(content) {
+        const lineOfficialAccountUrl = 'https://line.me/R/ti/p/@YOUR_LINE_ID';
+        const encodedMessage = encodeURIComponent(content);
+        const url = `${lineOfficialAccountUrl}?${encodedMessage}`;
+        
+        window.location.href = url;
     }
 
     function showLineOptions() {
@@ -913,36 +936,6 @@
             width: 128,
             height: 128
         });
-    }
-
-    function sendToOfficialLine(method) {
-        try {
-            const modalContent = document.getElementById('modalContent').textContent;
-            copyToClipboard(modalContent);
-            
-            const lineOfficialAccountUrl = 'https://line.me/R/ti/p/@vcprint';
-            const encodedMessage = encodeURIComponent(modalContent);
-            
-            let url;
-            if (method === 'app') {
-                url = `line://msg/text/?${encodedMessage}`;
-            } else {
-                url = `${lineOfficialAccountUrl}?${encodedMessage}`;
-            }
-            
-            // 使用 window.open 並存儲返回的窗口對象
-            const newWindow = window.open(url, '_blank');
-            
-            // 檢查窗口是否成功打開
-            if (newWindow === null || typeof(newWindow) === 'undefined') {
-                alert('似乎您的瀏覽器阻擋了彈出窗口。請允許彈出窗口或使用 QR 碼掃描方式。');
-            } else {
-                alert('LINE 已在新窗口中打開。如果沒有看到 LINE 窗口，請檢查您的瀏覽器設置。');
-            }
-        } catch (error) {
-            console.error('傳送至官方 LINE 時發生錯誤:', error);
-            alert('傳送失敗，請稍後再試。');
-        }
     }
 
     function copyToClipboard(text) {
