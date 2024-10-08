@@ -859,6 +859,25 @@
         document.getElementById('shippingDetails').style.display = 'none';
     }
 
+    function initializeLineButtons() {
+        const sendToLineBtn = document.getElementById('sendToLineBtn');
+        if (sendToLineBtn) {
+            sendToLineBtn.addEventListener('click', handleSendToLine);
+        }
+    }
+
+    function handleSendToLine() {
+        const deviceType = detectDevice();
+        const modalContent = document.getElementById('modalContent').textContent;
+        copyToClipboard(modalContent);
+        
+        if (deviceType === 'desktop') {
+            sendToDesktopLine(modalContent);
+        } else {
+            sendToMobileLine(modalContent);
+        }
+    }    
+
     function detectDevice() {
         const userAgent = navigator.userAgent || navigator.vendor || window.opera;
         if (/android/i.test(userAgent)) {
@@ -868,31 +887,6 @@
             return 'mobile';
         }
         return 'desktop';
-    }
-
-    function initializeLineButtons() {
-        const sendToLineBtn = document.getElementById('sendToLineBtn');
-        if (sendToLineBtn) {
-            sendToLineBtn.addEventListener('click', handleSendToLine);
-        }
-    }
-
-    function handleSendToLine() {
-        const modalContent = document.getElementById('modalContent').textContent;
-        copyToClipboard(modalContent);
-    
-        // 使用通用的 LINE 網頁版 URL
-        const lineOfficialAccountUrl = 'https://line.me/R/ti/p/@vcprint';
-        const encodedMessage = encodeURIComponent(modalContent);
-        const url = `${lineOfficialAccountUrl}?${encodedMessage}`;
-    
-        // 嘗試打開 LINE
-        window.open(url, '_blank');
-    
-        // 添加一個超時檢查，以確保用戶知道如何手動操作
-        setTimeout(() => {
-            alert('如果 LINE 沒有自動打開，請手動打開 LINE 並貼上已複製的訊息內容。');
-        }, 3000);
     }
 
     function showLineOptions() {
@@ -908,6 +902,28 @@
             console.error('顯示 LINE 選項時發生錯誤:', error);
             alert('顯示選項時發生錯誤，請稍後再試。');
         }
+    }
+
+    function sendToDesktopLine(content) {
+        const lineProtocolUrl = `line://msg/text/?${encodeURIComponent(content)}`;
+        
+        // 嘗試打開桌面版 LINE
+        window.location.href = lineProtocolUrl;
+        
+        // 如果 5 秒後頁面還在，說明可能沒有安裝 LINE 或打開失敗
+        setTimeout(() => {
+            if (!document.hidden) {
+                alert('無法打開桌面版 LINE。請確保您已安裝 LINE，或手動打開 LINE 並貼上已複製的內容。');
+            }
+        }, 5000);
+    }
+
+    function sendToMobileLine(content) {
+        const lineOfficialAccountUrl = 'https://line.me/R/ti/p/@vcprint';
+        const encodedMessage = encodeURIComponent(content);
+        const url = `${lineOfficialAccountUrl}?${encodedMessage}`;
+        
+        window.location.href = url;
     }
 
     function generateQRCode() {
@@ -931,6 +947,7 @@
                 console.error('複製到剪貼板失敗:', err);
             });
         } else {
+            // 降級方案
             const textArea = document.createElement("textarea");
             textArea.value = text;
             textArea.style.position = "fixed";
