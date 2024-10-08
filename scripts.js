@@ -878,36 +878,21 @@
     }
 
     function handleSendToLine() {
-        const deviceType = detectDevice();
         const modalContent = document.getElementById('modalContent').textContent;
         copyToClipboard(modalContent);
     
-        if (deviceType === 'desktop') {
-            sendToDesktopLine(modalContent);
-        } else {
-            sendToMobileLine(modalContent);
-        }
-    }
-    function sendToDesktopLine(content) {
-        const lineProtocolUrl = `line://msg/text/?${encodeURIComponent(content)}`;
-        
-        // 嘗試打開桌面版 LINE
-        window.location.href = lineProtocolUrl;
-        
-        // 如果 5 秒後頁面還在，說明可能沒有安裝 LINE 或打開失敗
-        setTimeout(() => {
-            if (!document.hidden) {
-                alert('無法打開桌面版 LINE。請確保您已安裝 LINE，或手動打開 LINE 並貼上已複製的內容。');
-            }
-        }, 5000);
-    }
-
-    function sendToMobileLine(content) {
+        // 使用通用的 LINE 網頁版 URL
         const lineOfficialAccountUrl = 'https://line.me/R/ti/p/@vcprint';
-        const encodedMessage = encodeURIComponent(content);
+        const encodedMessage = encodeURIComponent(modalContent);
         const url = `${lineOfficialAccountUrl}?${encodedMessage}`;
-        
-        window.location.href = url;
+    
+        // 嘗試打開 LINE
+        window.open(url, '_blank');
+    
+        // 添加一個超時檢查，以確保用戶知道如何手動操作
+        setTimeout(() => {
+            alert('如果 LINE 沒有自動打開，請手動打開 LINE 並貼上已複製的訊息內容。');
+        }, 3000);
     }
 
     function showLineOptions() {
