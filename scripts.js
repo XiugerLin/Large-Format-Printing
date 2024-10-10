@@ -870,13 +870,22 @@
         const deviceType = detectDevice();
         const modalContent = document.getElementById('modalContent').textContent;
         copyToClipboard(modalContent);
-        
+    
         if (deviceType === 'desktop') {
             sendToDesktopLine(modalContent);
         } else {
             sendToMobileLine(modalContent);
         }
-    }    
+
+        const sendButton = document.getElementById('sendToLineBtn');
+        sendButton.textContent = '正在打開 LINE...';
+        sendButton.disabled = true;
+        
+        setTimeout(() => {
+            sendButton.textContent = '傳送至官方 Line';
+            sendButton.disabled = false;
+        }, 5000);
+    }
 
     function detectDevice() {
         const userAgent = navigator.userAgent || navigator.vendor || window.opera;
@@ -914,16 +923,39 @@
         setTimeout(() => {
             if (!document.hidden) {
                 alert('無法打開桌面版 LINE。請確保您已安裝 LINE，或手動打開 LINE 並貼上已複製的內容。');
+                showQRCode(content);
             }
         }, 5000);
     }
 
     function sendToMobileLine(content) {
-        const lineOfficialAccountUrl = 'https://line.me/R/ti/p/@vcprint';
+        const lineOfficialAccountUrl = 'https://line.me/R/oaMessage/@vcprint/';
         const encodedMessage = encodeURIComponent(content);
         const url = `${lineOfficialAccountUrl}?${encodedMessage}`;
         
+        // 嘗試打開 LINE
         window.location.href = url;
+        
+        // 如果 3 秒後頁面還在，提示用戶
+        setTimeout(() => {
+            if (!document.hidden) {
+                alert('如果 LINE 沒有自動打開，請手動打開 LINE 並貼上已複製的訊息內容。');
+            }
+        }, 3000);
+    }
+    
+    function showQRCode(content) {
+        // 生成包含內容的 QR 碼
+        const qrCodeContainer = document.getElementById('qrCodeContainer');
+        qrCodeContainer.innerHTML = ''; // 清除之前的 QR Code
+        
+        new QRCode(qrCodeContainer, {
+            text: `https://line.me/R/oaMessage/@vcprint/?${encodeURIComponent(content)}`,
+            width: 128,
+            height: 128
+        });
+        
+        qrCodeContainer.style.display = 'block';
     }
 
     function generateQRCode() {
@@ -947,7 +979,6 @@
                 console.error('複製到剪貼板失敗:', err);
             });
         } else {
-            // 降級方案
             const textArea = document.createElement("textarea");
             textArea.value = text;
             textArea.style.position = "fixed";
