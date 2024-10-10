@@ -1,7 +1,7 @@
 /* 
  * 大圖輸出計算機樣式表
- * 版本: 3.0
- * 最後更新: 2024-10-05
+ * 版本: 4.0
+ * 最後更新: 2024-10-10
  */
 
 /* ===== 1. 全局變量 ===== */
@@ -59,7 +59,40 @@ body {
     animation: fadeIn 0.5s ease-out;
 }
 
-/* ===== 3. 表單樣式 ===== */
+/* ===== 3. 通用元素樣式 ===== */
+a, button, input, select, textarea {
+    transition: all var(--transition-duration) ease;
+}
+
+a:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.btn {
+    font-weight: bold;
+    border: none;
+    border-radius: var(--border-radius-small);
+    padding: 8px 16px;
+    box-shadow: var(--box-shadow-default);
+    transition: all var(--transition-duration) ease;
+    color: var(--button-text-color);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--box-shadow-hover);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+/* ===== 4. 表單樣式 ===== */
 .custom-form {
     background: linear-gradient(145deg, rgba(255, 111, 0, 0.1), rgba(255, 187, 0, 0.1));
     padding: 30px;
@@ -143,6 +176,7 @@ body {
     user-select: none;
 }
 
+/* ===== 5. 尺寸組樣式 ===== */
 .custom-form .dimension-group {
     display: flex;
     align-items: center;
@@ -150,7 +184,7 @@ body {
 }
 
 .custom-form .dimension-group .form-control {
-    margin: 0 10px;
+    margin: 0 5px;
 }
 
 .custom-form .dimension-container {
@@ -169,6 +203,37 @@ body {
     text-align: center;
 }
 
+/* ===== 6. 按鈕樣式 ===== */
+.size-buttons-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    margin-bottom: 15px;
+}
+
+.size-buttons-container .btn {
+    flex: 1;
+    margin: 0 5px;
+    padding: 10px 15px;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.size-buttons-container .btn:first-child {
+    margin-left: 0;
+}
+
+.size-buttons-container .btn:last-child {
+    margin-right: 0;
+}
+
 .custom-form .form-footer {
     display: flex;
     justify-content: space-between;
@@ -176,45 +241,16 @@ body {
 }
 
 .custom-form .form-footer .btn {
-    flex: 0 0 48%;
-    padding: 12px 24px;
-    font-size: var(--large-font-size);
-    font-weight: bold;
-    border: none;
-    border-radius: var(--border-radius-small);
-    transition: all var(--transition-duration) ease;
-    box-shadow: var(--box-shadow-default);
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    flex: 1;
+    margin-right: 10px;
 }
 
-.custom-form .form-footer .btn:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--box-shadow-hover);
+.custom-form .form-footer .btn:last-child {
+    margin-right: 0;
 }
 
-.custom-form .form-footer .btn:active {
-    transform: translateY(0);
-}
-
-/* ===== 4. 按鈕樣式 ===== */
-.custom-form .btn {
-    font-weight: bold;
-    border: none;
-    border-radius: var(--border-radius-small);
-    padding: 8px 16px;
-    box-shadow: var(--box-shadow-default);
-    transition: all var(--transition-duration) ease;
-    color: var(--button-text-color);
-}
-
-.custom-form .btn:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--box-shadow-hover);
-}
-
-.custom-form .btn:active {
-    transform: translateY(0);
+.custom-form .form-footer .btn-reset {
+    margin-right: 10px;
 }
 
 .custom-form .btn-info {
@@ -255,7 +291,7 @@ body {
     background-color: var(--btn-primary-hover-bg);
 }
 
-/* ===== 5. 輸出列表樣式 ===== */
+/* ===== 7. 輸出列表樣式 ===== */
 .output-list-header {
     font-size: 2rem;
     color: var(--primary-color);
@@ -287,7 +323,7 @@ body {
     vertical-align: middle;
 }
 
-/* ===== 6. 表格樣式 ===== */
+/* ===== 8. 表格樣式 ===== */
 .output-list-table {
     width: 100%;
     table-layout: fixed;
@@ -334,19 +370,18 @@ body {
     word-break: break-word;
 }
 
-/* 設置表格列寬度 */
 .output-list-table th:nth-child(1),
-.output-list-table td:nth-child(1) { width: 45%; } /* 材質 */
+.output-list-table td:nth-child(1) { width: 45%; }
 .output-list-table th:nth-child(2),
-.output-list-table td:nth-child(2) { width: 15%; } /* 尺寸 */
+.output-list-table td:nth-child(2) { width: 15%; }
 .output-list-table th:nth-child(3),
-.output-list-table td:nth-child(3) { width: 10%; } /* 數量 */
+.output-list-table td:nth-child(3) { width: 10%; }
 .output-list-table th:nth-child(4),
-.output-list-table td:nth-child(4) { width: 10%; } /* 單價 */
+.output-list-table td:nth-child(4) { width: 10%; }
 .output-list-table th:nth-child(5),
-.output-list-table td:nth-child(5) { width: 10%; } /* 金額 */
+.output-list-table td:nth-child(5) { width: 10%; }
 .output-list-table th:nth-child(6),
-.output-list-table td:nth-child(6) { width: 10%; } /* 操作 */
+.output-list-table td:nth-child(6) { width: 10%; }
 
 .output-list-table tbody tr {
     transition: background-color var(--transition-duration) ease;
@@ -364,14 +399,22 @@ body {
     background-color: var(--table-hover-bg-color);
 }
 
+.output-list-table td:nth-child(3),
+.output-list-table td:nth-child(4),
+.output-list-table td:nth-child(5) {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+}
+
 .disclaimer-text {
     color: red;
     font-weight: bold;
     margin: 0px;
     text-align: right;
     font-size: 1em;
-    padding-right: 15px; /* 與總金額對齊 */
+    padding-right: 15px;
 }
+
 .price-disclaimer {
     color: red;
     padding: 5px;
@@ -381,7 +424,8 @@ body {
     font-size: 1rem;
     background-color: #fff3f3;
 }
-/* ===== 7. 提示工具樣式 ===== */
+
+/* ===== 9. 提示工具樣式 ===== */
 .custom-tooltip,
 .tooltip {
     background-color: var(--btn-danger-bg) !important;
@@ -413,13 +457,11 @@ body {
     border-right-color: inherit !important;
 }
 
-/* 紅色 tooltip 樣式 */
 .tooltip-icon.text-danger + .tooltip .tooltip-inner,
 .tooltip-icon.text-danger + .tooltip .tooltip-arrow::before {
-    background-color: red !important; /* 保持紅色警告 */
+    background-color: red !important;
 }
 
-/* 確保在所有方向上箭頭顏色一致 */
 .custom-tooltip.bs-tooltip-top .tooltip-arrow::before,
 .tooltip.bs-tooltip-top .tooltip-arrow::before {
     border-top-color: inherit;
@@ -440,7 +482,6 @@ body {
     border-right-color: inherit;
 }
 
-/* 優惠價 tooltip 特定樣式 */
 .custom-tooltip.discount-tooltip,
 .tooltip.discount-tooltip {
     background-color: var(--btn-add-dimension-bg) !important;
@@ -454,128 +495,103 @@ body {
     border-right-color: var(--btn-add-dimension-bg) !important;
 }
 
-/* 更新備註欄中的 tooltip 樣式，包括快遞取件選項 */
-.remarks-section .form-check-inline .info-icon,
-.remarks-section .form-check-inline .fa-info-circle {
-    color: var(--btn-danger-bg) !important; /* 使用!important來確保優先級 */
-    cursor: help;
-    transition: color var(--transition-duration) ease;
-}
-
-.remarks-section .form-check-inline .info-icon:hover,
-.remarks-section .form-check-inline .fa-info-circle:hover {
-    color: var(--btn-danger-hover-bg) !important;
-}
-
-/* 確保tooltip本身的樣式也正確 */
-.remarks-section .form-check-inline .tooltip .tooltip-inner {
-    background-color: var(--btn-danger-bg) !important;
-    color: #ffffff !important;
-}
-
-.remarks-section .form-check-inline .tooltip .tooltip-arrow::before {
-    border-top-color: var(--btn-danger-bg) !important;
-}
-
-/* ===== 8. TomSelect 樣式 ===== */
-.ts-wrapper {
+/* ===== 10. 材質選擇樣式 ===== */
+.material-select-wrapper {
     position: relative;
+    width: 100%;
+    font-family: var(--main-font);
+    margin-bottom: 1rem;
 }
 
-.ts-control {
-    cursor: text;
-    padding-right: 30px;
-    background-color: var(--input-bg-color);
+.material-select-input {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: var(--main-font-size);
     border: 2px solid var(--input-border-color);
     border-radius: var(--border-radius-medium);
+    background-color: var(--input-bg-color);
+    font-weight: bold;
+    color: black;
     transition: all var(--transition-duration) ease;
-}
-
-.ts-control:hover {
-    border-color: var(--input-hover-border-color);
-}
-
-.ts-control input {
-    border: none;
     outline: none;
-    background: transparent;
-    width: 100%;
-    height: 100%;
+    box-shadow: var(--box-shadow-default);
+}
+
+.material-select-input:focus {
+    border-color: var(--input-hover-border-color);
+    box-shadow: 0 0 0 0.2rem var(--input-shadow-color);
+}
+
+.material-select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: var(--input-bg-color);
+    border: 2px solid var(--input-border-color);
+    border-top: none;
+    border-radius: 0 0 var(--border-radius-medium) var(--border-radius-medium);
+    max-height: 250px;
+    overflow-y: auto;
+    display: none;
+    z-index: 1000;
+    box-shadow: var(--box-shadow-default);
+    list-style-type: none;
     padding: 0;
     margin: 0;
-    font-size: inherit;
-    font-family: inherit;
-    cursor: text;
 }
 
-.ts-dropdown {
-    border: 2px solid var(--input-border-color);
-    border-radius: var(--border-radius-medium);
-    box-shadow: var(--box-shadow-default);
-    background-color: var(--input-bg-color);
-}
-
-.ts-dropdown .option {
-    padding: 10px 20px;
+.material-select-dropdown li {
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--input-border-color);
     cursor: pointer;
-    transition: all var(--transition-duration) ease;
+    transition: background-color var(--transition-duration) ease;
     color: var(--primary-color);
-    font-weight: 500;
+    font-weight: bold;
 }
 
-.ts-dropdown .option:hover,
-.ts-dropdown .option.active {
-    background-color: var(--primary-color);
+.material-select-dropdown li:last-child {
+    border-bottom: none;
+}
+
+.material-select-dropdown li:hover,
+.material-select-dropdown li.selected {
+    background-color: var(--secondary-color);
     color: white;
-    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
 }
 
-.ts-dropdown .option.disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+.material-select-dropdown .recent-item {
+    font-style: italic;
+    background-color: #f0f0f0;
 }
 
-.ts-dropdown .ts-dropdown-content {
-    scrollbar-width: thin;
-    scrollbar-color: var(--primary-color) var(--input-bg-color);
+.material-select-dropdown .dropdown-separator {
+    padding: 5px 15px;
+    font-weight: bold;
+    background-color: #e0e0e0;
+    color: #666;
+    cursor: default;
 }
 
-.ts-dropdown .ts-dropdown-content::-webkit-scrollbar {
+.material-select-dropdown::-webkit-scrollbar {
     width: 8px;
 }
 
-.ts-dropdown .ts-dropdown-content::-webkit-scrollbar-track {
+.material-select-dropdown::-webkit-scrollbar-track {
     background: var(--input-bg-color);
-}
-
-.ts-dropdown .ts-dropdown-content::-webkit-scrollbar-thumb {
-    background-color: var(--primary-color);
     border-radius: 4px;
-    border: 2px solid var(--input-bg-color);
 }
 
-.ts-wrapper .clear-button {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1.2em;
-    color: #999;
-    cursor: pointer;
-    transition: color var(--transition-duration) ease;
+.material-select-dropdown::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
 }
 
-.ts-wrapper .clear-button:hover {
-    color: var(--btn-danger-bg);
+.material-select-dropdown::-webkit-scrollbar-thumb:hover {
+    background: var(--btn-primary-hover-bg);
 }
 
-.ts-dropdown .no-results {
-    padding: 10px 20px;
-    color: var(--btn-danger-bg);
-    font-style: italic;
-}
-
-/* ===== 9. 總計區域樣式 ===== */
+/* ===== 11. 總計區域樣式 ===== */
 .total-section {
     margin-top: 20px;
     margin-bottom: 40px;
@@ -625,7 +641,7 @@ body {
     font-size: 1.2em;
 }
 
-/* ===== 10. 備註區域樣式 ===== */
+/* ===== 12. 備註區域樣式 ===== */
 .remarks-section {
     background: linear-gradient(145deg, rgba(255, 111, 0, 0.1), rgba(255, 187, 0, 0.1));
     border: none;
@@ -770,15 +786,6 @@ body {
     flex: 0 0 48%;
 }
 
-.remarks-section .btn:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--box-shadow-hover);
-}
-
-.remarks-section .btn:active {
-    transform: translateY(0);
-}
-
 .remarks-section .btn-secondary {
     background-color: var(--btn-reset-bg);
     color: #333;
@@ -799,6 +806,7 @@ body {
 .remarks-section .btn-primary:active {
     background-color: var(--btn-primary-hover-bg);
 }
+
 .remarks-section .form-select {
     height: 50px;
     border-radius: var(--border-radius-medium);
@@ -819,7 +827,8 @@ body {
 #pickupDateInputContainer {
     margin-top: 10px;
 }
-/* ===== 11. 清除所有按鈕樣式 ===== */
+
+/* ===== 13. 清除所有按鈕樣式 ===== */
 #clearAllBtn {
     background-color: var(--btn-danger-bg);
     color: white;
@@ -844,7 +853,7 @@ body {
     margin-right: 5px;
 }
 
-/* ===== 12. 模態框樣式 ===== */
+/* ===== 14. 模態框樣式 ===== */
 #outputModal .modal-content {
     background-color: #f8f9fa;
     border-radius: 10px;
@@ -906,7 +915,7 @@ body {
 }
 
 #sendToLineBtn::before {
-    content: "\f075"; /* Font Awesome 的消息圖標 Unicode */
+    content: "\f075";
     font-family: "Font Awesome 5 Free";
     margin-right: 5px;
 }
@@ -935,12 +944,6 @@ body {
     color: #666;
 }
 
-@media (max-width: 768px) {
-    #qrCodeContainer {
-        display: none !important;
-    }
-}
-
 #copyTextBtn {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
@@ -951,7 +954,7 @@ body {
     border-color: var(--btn-primary-hover-bg);
 }
 
-/* ===== 13. 運送詳情樣式 ===== */
+/* ===== 15. 運送詳情樣式 ===== */
 #shippingDetails {
     margin-top: 15px;
     padding: 15px;
@@ -978,104 +981,8 @@ body {
 #shippingDetails .mb-3 {
     margin-bottom: 1rem !important;
 }
-.material-select-wrapper {
-    position: relative;
-    width: 100%;
-    font-family: var(--main-font);
-    margin-bottom: 1rem;
-}
 
-.material-select-input {
-    width: 100%;
-    padding: 12px 15px;
-    font-size: var(--main-font-size);
-    border: 2px solid var(--input-border-color);
-    border-radius: var(--border-radius-medium);
-    background-color: var(--input-bg-color);
-    font-weight: bold;
-    color: black;
-    transition: all var(--transition-duration) ease;
-    outline: none;
-    box-shadow: var(--box-shadow-default);
-}
-
-.material-select-input:focus {
-    border-color: var(--input-hover-border-color);
-    box-shadow: 0 0 0 0.2rem var(--input-shadow-color);
-}
-
-.material-select-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background-color: var(--input-bg-color);
-    border: 2px solid var(--input-border-color);
-    border-top: none;
-    border-radius: 0 0 var(--border-radius-medium) var(--border-radius-medium);
-    max-height: 250px;
-    overflow-y: auto;
-    display: none;
-    z-index: 1000;
-    box-shadow: var(--box-shadow-default);
-    list-style-type: none; /* 移除列表項目的默認樣式（圓點） */
-    padding: 0; /* 移除默認的內邊距 */
-    margin: 0; /* 移除默認的外邊距 */
-}
-
-.material-select-dropdown li {
-    padding: 12px 15px;
-    border-bottom: 1px solid var(--input-border-color);
-    cursor: pointer;
-    transition: background-color var(--transition-duration) ease;
-    color: var(--primary-color);
-    font-weight: bold; /* 加粗字體 */
-}
-
-.material-select-dropdown li:last-child {
-    border-bottom: none; /* 移除最後一個選項的底部邊框 */
-}
-
-.material-select-dropdown li:hover,
-.material-select-dropdown li.selected {
-    background-color: var(--secondary-color);
-    color: white;
-}
-
-.material-select-dropdown li:not(:last-child) {
-    border-bottom: 1px solid var(--input-border-color);
-}
-.material-select-dropdown .recent-item {
-    font-style: italic;
-    background-color: #f0f0f0;
-}
-
-.material-select-dropdown .dropdown-separator {
-    padding: 5px 15px;
-    font-weight: bold;
-    background-color: #e0e0e0;
-    color: #666;
-    cursor: default;
-}
-/* 自定義滾動條樣式 */
-.material-select-dropdown::-webkit-scrollbar {
-    width: 8px;
-}
-
-.material-select-dropdown::-webkit-scrollbar-track {
-    background: var(--input-bg-color);
-    border-radius: 4px;
-}
-
-.material-select-dropdown::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
-    border-radius: 4px;
-}
-
-.material-select-dropdown::-webkit-scrollbar-thumb:hover {
-    background: var(--btn-primary-hover-bg);
-}
-/* ===== 14. 響應式設計 ===== */
+/* ===== 16. 響應式設計 ===== */
 @media (max-width: 768px) {
     .custom-form,
     .remarks-section {
@@ -1097,6 +1004,38 @@ body {
     .remarks-section .form-control {
         font-size: 0.9rem;
         height: 45px;
+    }
+
+    .custom-form .dimension-group {
+        flex-wrap: nowrap;
+        align-items: center;
+    }
+
+    .custom-form .dimension-group .form-control {
+        flex: 1;
+        min-width: 0;
+        font-size: 14px;
+    }
+
+    .custom-form .dimension-group .btn-remove-dimension {
+        width: 30px;
+        height: 30px;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 14px;
+        border-radius: 4px;
+        margin-left: 5px;
+    }
+
+    .custom-form .dimension-group .btn-remove-dimension i {
+        font-size: 12px;
+    }
+
+    .custom-form .dimension-number {
+        font-size: 1rem;
+        min-width: 20px;
     }
 
     .output-list-table {
@@ -1151,49 +1090,8 @@ body {
         font-size: var(--small-font-size);
     }
 
-    .custom-form .dimension-group {
-        flex-wrap: wrap;
-    }
-
-    .custom-form .dimension-group .form-control {
-        margin: 5px 0;
-        width: calc(50% - 10px);
-    }
-
-    .custom-form .dimension-group .btn-remove-dimension {
-        margin-top: 5px;
-    }
-
-    .tooltip-icon {
-        float: right;
-        margin-left: 5px;
-    }
-
-    .output-list-table .btn-danger {
-        width: 100%;
-        margin-top: 10px;
-        text-align: center;
-        padding: 12px;
-        font-size: 1.2rem;
-        border-radius: 20px;
-    }
-
-    .output-list-table td:nth-of-type(5) {
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-    }
-
-    #shippingDetails .form-control {
-        height: calc(2em + 0.75rem + 2px);
-    }
-
-    #shippingDetails .col-md-4 {
-        margin-bottom: 15px;
-    }
-
-    .remarks-section .card-title {
-        font-size: 1.8rem;
+    #qrCodeContainer {
+        display: none !important;
     }
 
     .remarks-section .btn {
@@ -1203,9 +1101,22 @@ body {
 }
 
 @media (max-width: 576px) {
-    .custom-form,
-    .remarks-section {
-        padding: 0px;
+    .size-buttons-container {
+        flex-direction: row;
+        align-items: stretch;
+    }
+
+    .size-buttons-container .btn {
+        height: 40px;
+    }
+
+    .custom-form .d-flex.justify-content-between {
+        flex-direction: row;
+    }
+
+    .custom-form .d-flex.justify-content-between .btn {
+        width: auto;
+        margin-bottom: 0;
     }
 
     .custom-form h1,
@@ -1218,9 +1129,41 @@ body {
         font-size: 0.8rem;
     }
 
+     .custom-form .dimension-group {
+        flex-wrap: nowrap;
+        justify-content: space-between;
+    }
+
     .custom-form .dimension-group .form-control {
-        width: 100%;
-        margin: 5px 0;
+        flex: 1;
+        margin: 0 2px;
+        font-size: 12px;
+        padding: 5px;
+    }
+
+    .custom-form .dimension-group .form-control::placeholder {
+        font-size: 14px;
+    }
+
+    .custom-form .btn-add-dimension {
+        margin-top: 0;
+    }
+
+    .custom-form .btn-info {
+        margin-bottom: 10px;
+    }
+
+    .custom-form .dimension-group .btn-remove-dimension {
+        width: 24px;
+        height: 24px;
+        font-size: 10px;
+        margin-left: 2px;
+    }
+
+    .custom-form .dimension-number {
+        font-size: 0.9rem;
+        min-width: 18px;
+        margin-right: 5px;
     }
 
     .custom-form .btn,
@@ -1230,9 +1173,17 @@ body {
         padding: 12px 15px;
     }
 
-    .form-footer {
-        display: flex;
-        flex-direction: column;
+    .custom-form .form-footer {
+        flex-direction: row;
+    }
+
+    .custom-form .form-footer .btn {
+        flex: 1;
+        margin-top: 0;
+    }
+
+    .custom-form .form-footer .btn-reset {
+        margin-right: 10px;
     }
 
     .custom-form .form-control,
@@ -1285,7 +1236,65 @@ body {
     }
 }
 
-/* ===== 15. 動畫效果 ===== */
+@media (max-width: 380px) {
+    .custom-form .size-buttons-container,
+    .custom-form .form-footer {
+        flex-direction: column;
+    }
+
+    .custom-form .size-buttons-container .btn,
+    .custom-form .form-footer .btn {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .custom-form .size-buttons-container .btn:last-child,
+    .custom-form .form-footer .btn:last-child {
+        margin-bottom: 0;
+    }
+}
+
+/* ===== 17. 輔助類別 ===== */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.error-message {
+    color: var(--btn-danger-bg);
+    font-size: var(--small-font-size);
+    margin-top: 5px;
+    font-weight: bold;
+}
+
+.success-message {
+    color: var(--btn-add-dimension-bg);
+    font-size: var(--small-font-size);
+    margin-top: 5px;
+    font-weight: bold;
+}
+
+.ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.required::after {
+    content: '*';
+    color: var(--btn-danger-bg);
+    margin-left: 4px;
+}
+
+/* ===== 18. 動畫效果 ===== */
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -1315,142 +1324,7 @@ body {
     to { opacity: 0; }
 }
 
-/* ===== 16. 輔助功能改進 ===== */
-.sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-}
-
-a:focus,
-button:focus,
-input:focus,
-select:focus,
-textarea:focus {
-    outline: 2px solid var(--primary-color);
-    outline-offset: 2px;
-}
-
-/* ===== 17. 打印樣式 ===== */
-@media print {
-    .custom-form,
-    .btn,
-    .form-footer,
-    .remarks-section {
-        display: none;
-    }
-
-    .output-list-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .output-list-table th,
-    .output-list-table td {
-        border: 1px solid #000;
-    }
-
-    .output-list-header::before {
-        content: none;
-    }
-
-    .total-section {
-        page-break-inside: avoid;
-    }
-}
-
-/* ===== 18. 滾動條美化 ===== */
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: var(--border-radius-medium);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
-    border-radius: var(--border-radius-medium);
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--btn-primary-hover-bg);
-}
-
-/* ===== 19. 其他優化 ===== */
-
-/* 改善輸入框的焦點效果 */
-.custom-form .form-control:focus,
-.remarks-section .form-control:focus {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(255, 111, 0, 0.1);
-}
-
-/* 改善複選框的可訪問性 */
-.custom-form .form-check-input:focus,
-.remarks-section .form-check-input:focus {
-    box-shadow: 0 0 0 0.2rem rgba(255, 111, 0, 0.25);
-}
-
-/* 為所有交互元素添加過渡效果 */
-a, button, input, select, textarea {
-    transition: all var(--transition-duration) ease;
-}
-
-/* 為錯誤消息添加樣式 */
-.error-message {
-    color: var(--btn-danger-bg);
-    font-size: var(--small-font-size);
-    margin-top: 5px;
-    font-weight: bold;
-}
-
-/* 為成功消息添加樣式 */
-.success-message {
-    color: var(--btn-add-dimension-bg);
-    font-size: var(--small-font-size);
-    margin-top: 5px;
-    font-weight: bold;
-}
-
-/* 為禁用狀態的元素添加樣式 */
-.custom-form .form-control:disabled,
-.custom-form .form-select:disabled,
-.custom-form .btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-/* 提高表格中數字的可讀性 */
-.output-list-table td:nth-child(3),
-.output-list-table td:nth-child(4),
-.output-list-table td:nth-child(5) {
-    font-family: 'Courier New', Courier, monospace;
-    font-weight: bold;
-}
-
-/* 為長文本添加省略號 */
-.ellipsis {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* 為必填字段添加視覺提示 */
-.required::after {
-    content: '*';
-    color: var(--btn-danger-bg);
-    margin-left: 4px;
-}
-
-/* 添加頁面加載動畫 */
+/* ===== 19. 頁面加載動畫 ===== */
 .page-loader {
     position: fixed;
     top: 0;
@@ -1478,5 +1352,51 @@ a, button, input, select, textarea {
     100% { transform: rotate(360deg); }
 }
 
+/* ===== 20. 打印樣式 ===== */
+@media print {
+    .custom-form,
+    .btn,
+    .form-footer,
+    .remarks-section {
+        display: none;
+    }
+
+    .output-list-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .output-list-table th,
+    .output-list-table td {
+        border: 1px solid #000;
+    }
+
+    .output-list-header::before {
+        content: none;
+    }
+
+    .total-section {
+        page-break-inside: avoid;
+    }
+}
+
+/* ===== 21. 滾動條美化 ===== */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: var(--border-radius-medium);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: var(--border-radius-medium);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--btn-primary-hover-bg);
+}
+
 /* 結束樣式表 */
-/* 大圖輸出計算機樣式表 - 結束 */

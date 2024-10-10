@@ -7,9 +7,11 @@
     // ===== 初始化模組 =====
     document.addEventListener('DOMContentLoaded', async function() {
         try {
+            await loadMaterialsData();
+            await MaterialSelect.init(materialsData);
             await initializeApp();
         } catch (error) {
-            console.error('初始化應用程序時發生錯誤:', error);
+            console.error('初始化過程中發生錯誤:', error);
         }
     });
 
@@ -24,6 +26,7 @@
             initializeMaterialSelect();
             initializeFormSubmission();
             initializeModal();
+            initializeEventHandlers();
         } catch (error) {
             console.error('初始化過程中發生錯誤:', error);
         }
@@ -46,7 +49,14 @@
         document.querySelector('.btn-add-dimension').addEventListener('click', handleAddDimension);
         document.getElementById('calculatorForm').addEventListener('submit', handleFormSubmission);
         document.querySelector('button[type="reset"]').addEventListener('click', resetForm);
-        document.getElementById('dimensionContainer').addEventListener('click', handleDimensionContainerClick);
+        
+        // 使用事件委派來處理動態添加的元素
+        document.getElementById('dimensionContainer').addEventListener('click', function(event) {
+            if (event.target.closest('.btn-remove-dimension')) {
+                handleRemoveDimension(event);
+            }
+        });
+
         document.getElementById('clearAllBtn').addEventListener('click', handleClearAll);
         
         const remarksSubmitBtn = document.getElementById('remarksSubmitBtn');
@@ -66,7 +76,15 @@
 
         initializePickupDateListener();
     }
-
+    function handleRemoveDimension(event) {
+        const dimensionContainer = document.getElementById('dimensionContainer');
+        if (dimensionContainer.children.length > 1) {
+            const groupToRemove = event.target.closest('.dimension-group');
+            groupToRemove.remove();
+            updateGroupSelection();
+            updateDimensionNumbers();
+        }
+    }
     function initializePickupDateListener() {
         const pickupDateOption = document.getElementById('pickupDateOption');
         const pickupDateInputContainer = document.getElementById('pickupDateInputContainer');
@@ -86,7 +104,7 @@
         const DELIMITER = '+';
         let selectedIndex = -1;
 
-        async function init(materials) {
+        function init(materials) {
             try {
                 createMaterialSelectUI();
                 bindMaterialSelectEvents(materials);
@@ -272,7 +290,9 @@
             <input type="number" class="form-control length-input" placeholder="長度 (cm)" value="${length}" required step="0.1" min="0.1">
             <input type="number" class="form-control width-input" placeholder="寬度 (cm)" value="${width}" required step="0.1" min="0.1">
             <input type="number" class="form-control quantity-input" placeholder="數量" required min="1">
-            <button type="button" class="btn btn-danger btn-remove-dimension"><i class="fa fa-trash"></i></button>
+            <button type="button" class="btn btn-danger btn-remove-dimension" aria-label="刪除尺寸組">
+                <i class="fa fa-trash" aria-hidden="true"></i>
+            </button>
         `;
         return group;
     }
@@ -693,6 +713,40 @@
         
         const modal = new bootstrap.Modal(document.getElementById('outputModal'));
         modal.show();
+    
+        // 在模態框顯示後初始化按鈕
+        modal._element.addEventListener('shown.bs.modal', function () {
+            initializeModalActions();
+        });
+    }
+
+    function initializeModalActions() {
+        const desktopActions = document.getElementById('desktopActions');
+        const mobileActions = document.getElementById('mobileActions');
+        const copyTextBtn = document.getElementById('copyTextBtn');
+        const sendToLineBtn = document.getElementById('sendToLineBtn');
+        const officialLineQR = document.getElementById('officialLineQR');
+    
+        if (isMobileDevice()) {
+            desktopActions.style.display = 'none';
+            mobileActions.style.display = 'block';
+            if (sendToLineBtn) {
+                sendToLineBtn.addEventListener('click', handleSendToLine);
+            }
+        } else {
+            desktopActions.style.display = 'block';
+            mobileActions.style.display = 'none';
+            if (copyTextBtn) {
+                copyTextBtn.addEventListener('click', handleCopyContent);
+            }
+            if (officialLineQR) {
+                officialLineQR.addEventListener('click', openOfficialLineChat);
+            }
+        }
+    }
+
+    function isMobileDevice() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     }
 
     function generateOutputContent() {
@@ -799,32 +853,25 @@
     }
 
     function handleSendToLine() {
-        const deviceType = detectDevice();
         const modalContent = document.getElementById('modalContent');
-        
         if (modalContent && modalContent.textContent.trim() !== '') {
-            const content = modalContent.textContent;
-            
-            if (deviceType === 'desktop') {
-                handleCopyContent();
-                alert('內容已複製到剪貼板。請手動將內容貼上到 LINE 中發送。');
-            } else {
-                const lineUrl = generateMessageLink(content);
-                window.open(lineUrl, '_blank');
-            }
+            const content = encodeURIComponent(modalContent.textContent);
+            const lineUrl = `https://line.me/R/oaMessage/@vcprint/?${content}`;
+            window.open(lineUrl, '_blank');
         } else {
-            alert('沒有可用的內容來複製或分享');
+            alert('沒有可發送的內容');
         }
     }
 
+    function openOfficialLineChat() {
+        window.open('https://line.me/R/ti/p/@vcprint', '_blank');
+    }
+    
     function handleCopyContent() {
         const modalContent = document.getElementById('modalContent');
-        
         if (modalContent && modalContent.textContent.trim() !== '') {
-            const content = modalContent.textContent;
-            
-            navigator.clipboard.writeText(content).then(() => {
-                alert('內容已成功複製到剪貼板！');
+            navigator.clipboard.writeText(modalContent.textContent).then(() => {
+                alert('報價內容已成功複製到剪貼板！請將內容貼上到官方 LINE 聊天室。');
             }).catch(err => {
                 console.error('複製失敗:', err);
                 alert('複製失敗，請手動選擇並複製內容。');
@@ -833,6 +880,7 @@
             alert('沒有可複製的內容');
         }
     }
+
 
     function initializeModal() {
         const generateQRBtn = document.getElementById('generateQRBtn');
@@ -855,7 +903,27 @@
         showQRCodes(content);
     }
     
+    function formatQRContent(content) {
+        // 如果內容是純文本，可以考慮將其轉換為 URL
+        // 例如，使用 data URI 方案
+        const encodedContent = encodeURIComponent(content);
+        return `https://example.com/view?data=${encodedContent}`;
+        
+        // 或者，如果您希望直接打開文本，可以使用：
+        // return `data:text/plain;charset=utf-8,${encodedContent}`;
+    }
+
+    function generateQRCode(content, element) {
+        const qr = qrcode(0, 'M'); // 使用 'M' 級別的錯誤修正
+        qr.addData(content);
+        qr.make();
+        element.innerHTML = qr.createImgTag(5, 10); // 5 是每個模塊的大小，10 是邊距
+    }
+
     function showQRCodes(content) {
+        console.log('原始 QR 碼內容:', content);
+        const formattedContent = formatQRContent(content);
+        console.log('格式化後的 QR 碼內容:', formattedContent);
         const qrCodeContainer = document.getElementById('qrCodeContainer');
         const copyContentQRElement = document.getElementById('copyContentQR');
         qrCodeContainer.style.display = 'block';
@@ -864,12 +932,14 @@
         
         if (content && content.trim() !== '') {
             const limitedContent = limitQRCodeContent(content);
-            new QRCode(copyContentQRElement, {
-                text: limitedContent,
-                width: 200,
-                height: 200,
-                correctLevel : QRCode.CorrectLevel.M
-            });
+            const formattedContent = formatQRContent(limitedContent);
+            try {
+                generateQRCode(formattedContent, copyContentQRElement);
+                console.log('QR 碼生成成功，內容:', formattedContent);
+            } catch (error) {
+                console.error('生成 QR code 時發生錯誤:', error);
+                copyContentQRElement.textContent = '無法生成 QR 碼，請稍後再試';
+            }
     
             const enlargeButton = document.getElementById('enlargeCopyQR');
             if (enlargeButton) {
@@ -880,10 +950,6 @@
             }
         } else {
             copyContentQRElement.textContent = '無可用內容生成 QR 碼';
-            const enlargeButton = document.getElementById('enlargeCopyQR');
-            if (enlargeButton) {
-                enlargeButton.style.display = 'none';
-            }
         }
     }
     
@@ -924,34 +990,14 @@
         document.body.appendChild(modal);
     }
     
-    function updateModalUI() {
-        const modalFooter = document.querySelector('#outputModal .modal-footer');
-        const copyButton = document.createElement('button');
-        copyButton.className = 'btn btn-primary';
-        copyButton.textContent = '複製內容';
-        copyButton.onclick = handleCopyContent;
-        modalFooter.insertBefore(copyButton, modalFooter.firstChild);
-    }
-
-    function detectDevice() {
-        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-        if (/android/i.test(userAgent) || /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-            return 'mobile';
-        }
-        return 'desktop';
-    }
-
-    function generateMessageLink(content) {
-        const lineOfficialAccountUrl = 'https://line.me/R/ti/p/@vcprint';
-        const encodedMessage = encodeURIComponent(limitQRCodeContent(content));
-        return `${lineOfficialAccountUrl}?text=${encodedMessage}`;
-    }
-    
-    function limitQRCodeContent(content, maxLength = 1000) {
+    function limitQRCodeContent(content, maxLength = 300) {
+        // 移除可能導致問題的特殊字符
+        content = content.replace(/[^\w\s\-_.,?!@#$%^&*()]/g, '');
+        
         if (content.length <= maxLength) {
             return content;
         }
-        return content.substr(0, maxLength) + '...（內容已截斷）';
+        return content.substr(0, maxLength) + '...';
     }
 
     // ===== 公開 API =====

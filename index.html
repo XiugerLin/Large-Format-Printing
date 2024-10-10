@@ -48,20 +48,20 @@
                     <!-- 每個尺寸組會有一個編號標籤 -->
                     <div class="dimension-group mb-3 d-flex align-items-center">
                         <span class="dimension-number">1</span>
-                        <input type="number" class="form-control length-input" placeholder="長度 (cm)" required step="0.1"
+                        <input type="number" class="form-control length-input" placeholder="長(cm)" required step="0.1"
                             min="0.1">
-                        <input type="number" class="form-control width-input" placeholder="寬度 (cm)" required step="0.1"
+                        <input type="number" class="form-control width-input" placeholder="寬(cm)" required step="0.1"
                             min="0.1">
                         <input type="number" class="form-control quantity-input" placeholder="數量" required min="1">
                         <button type="button" class="btn btn-danger btn-remove-dimension"><i
                                 class="fa fa-trash"></i></button>
                     </div>
                 </div>
-                <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="size-buttons-container">
                     <!-- 開啟彈出視窗的按鈕 -->
                     <button type="button" class="btn btn-info fade-in-up" data-bs-toggle="modal"
                         data-bs-target="#sizeModal">
-                        <i class="fa fa-list me-2"></i> 常用尺寸
+                        <i class="fa fa-list"></i> 常用尺寸
                     </button>
                     <button type="button" class="btn btn-secondary btn-add-dimension fade-in-up">
                         <i class="fa fa-plus"></i> 新增尺寸組
@@ -70,10 +70,10 @@
             </div>
 
             <!-- 重置和提交按鈕的 footer -->
-            <div class="form-footer">
-                <button type="reset" class="btn btn-reset">重置</button>
-                <button type="submit" class="btn btn-submit">提交</button>
-            </div>
+            <div class="form-footer d-flex justify-content-between">
+                <button type="reset" class="btn btn-reset flex-grow-1 me-2">重置</button>
+                <button type="submit" class="btn btn-submit flex-grow-1">計算金額</button>
+              </div>
         </form>
     </div>
     <!-- 新增結果表格 -->
@@ -270,34 +270,33 @@
 
     <div class="modal fade" id="outputModal" tabindex="-1" aria-labelledby="outputModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="outputModalLabel">輸出內容</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="outputModalLabel">輸出內容</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <pre id="modalContent"></pre>
+                    <div id="desktopActions" style="display: none;">
+                        <button type="button" class="btn btn-primary" id="copyTextBtn">複製報價內容</button>
+                        <p>請將複製的內容傳送到 <span style="color: #00B900;">官方 LINE</span>，我們會盡快處理唷!</p>
+                        <img src="https://i.ibb.co/cvQCWKL/official-line-qr.png" alt="官方 LINE QR Code" id="officialLineQR" style="cursor: pointer; max-width: 200px;">
+                    </div>
+                    <div id="mobileActions" style="display: none;">
+                        <p>請點選下方按鈕將報價內容傳送至<span style="color: #00B900;">官方 LINE</span>，我們會盡快處理唷!</p>
+                        <button type="button" class="btn btn-success" id="sendToLineBtn">傳送至官方Line</button>
+                    </div>
+                </div>
             </div>
-            <div class="modal-body">
-              <pre id="modalContent"></pre>
-              <div id="qrCodeContainer" style="display: none;">
-                <div id="copyContentQR"></div>
-                <p>掃描此 QR Code 以在手機上獲取報價內容</p>
-                <button id="enlargeCopyQR" class="btn btn-secondary">放大 QR Code</button>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-primary" id="copyTextBtn">複製文字</button>
-              <button type="button" class="btn btn-success" id="generateQRBtn">生成 QR Code</button>
-              <button type="button" class="btn btn-success" id="sendToLineBtn">傳送至官方Line</button>
-            </div>
-          </div>
         </div>
-      </div>
+    </div>
 
     <textarea id="hiddenTextArea" style="position: absolute; left: -9999px;"></textarea>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.13.6/js/standalone/selectize.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://unpkg.com/qrcode-generator@1.4.4/qrcode.js"></script>
     <script src="sizeModal.js"></script>
     <script src="scripts.js"></script>
     <script>
