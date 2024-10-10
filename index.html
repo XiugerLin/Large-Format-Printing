@@ -5,10 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>大圖輸出計算機</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.bootstrap5.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.13.6/css/selectize.default.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.13.6/css/selectize.default.min.css">
     <link rel="stylesheet" href="sizeModal.css">
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -71,7 +73,7 @@
             <div class="form-footer">
                 <button type="reset" class="btn btn-reset">重置</button>
                 <button type="submit" class="btn btn-submit">提交</button>
-              </div>
+            </div>
         </form>
     </div>
     <!-- 新增結果表格 -->
@@ -79,9 +81,9 @@
         <h2 class="output-list-header">輸出清單</h2>
         <div class="d-flex justify-content-end mb-3">
             <button id="clearAllBtn" class="btn btn-danger">
-              <i class="fas fa-trash-alt"></i> 全部清除
+                <i class="fas fa-trash-alt"></i> 全部清除
             </button>
-          </div>
+        </div>
         <table id="resultTable" class="table output-list-table">
             <thead>
                 <tr>
@@ -149,17 +151,21 @@
                             <label class="form-label">取貨方式：</label>
                             <div class="delivery-options">
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="deliveryOption" id="selfPickup" value="自取">
+                                    <input class="form-check-input" type="radio" name="deliveryOption" id="selfPickup"
+                                        value="自取">
                                     <label class="form-check-label" for="selfPickup">自取</label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="deliveryOption" id="shipping" value="郵寄/貨運">
+                                    <input class="form-check-input" type="radio" name="deliveryOption" id="shipping"
+                                        value="郵寄/貨運">
                                     <label class="form-check-label" for="shipping">郵寄/貨運</label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="deliveryOption" id="express" value="快遞取件">
+                                    <input class="form-check-input" type="radio" name="deliveryOption" id="express"
+                                        value="快遞取件">
                                     <label class="form-check-label" for="express">快遞取件</label>
-                                    <i class="fa fa-info-circle ms-1" data-bs-toggle="tooltip" data-bs-placement="top" title="請由客戶自行叫車"></i>
+                                    <i class="fa fa-info-circle ms-1" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="請由客戶自行叫車"></i>
                                 </div>
                             </div>
                             <div id="shippingDetails" style="display: none;">
@@ -261,28 +267,26 @@
             </div>
         </div>
     </div>
-    
-    <div id="outputModal" class="modal fade" tabindex="-1" aria-labelledby="outputModalLabel" aria-hidden="true">
+
+    <div class="modal fade" id="outputModal" tabindex="-1" aria-labelledby="outputModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title w-100 text-center" id="outputModalLabel">輸出內容</h5>
+              <h5 class="modal-title" id="outputModalLabel">輸出內容</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <pre id="modalContent"></pre>
-            </div>
-            <div class="price-disclaimer" style="color: red; padding: 15px; text-align: center; font-weight: bold;">
-              **此價格僅為試算金額，不含其他後加工及配送等費用，若須正式報價歡迎來訊詢問。**
-            </div>
-            <div class="modal-footer flex-column align-items-stretch">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
-              <button type="button" class="btn btn-primary" id="copyTextBtn">複製文字</button>
-              <button type="button" class="btn btn-success" id="sendToLineBtn">傳送至官方Line</button>
               <div id="qrCodeContainer" style="display: none;">
-                <p>請使用手機掃描以下 QR 碼：</p>
-                <div id="qrCode"></div>
+                <div id="copyContentQR"></div>
+                <p>掃描此 QR Code 以在手機上獲取報價內容</p>
+                <button id="enlargeCopyQR" class="btn btn-secondary">放大 QR Code</button>
+              </div>
             </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" id="copyTextBtn">複製文字</button>
+              <button type="button" class="btn btn-success" id="generateQRBtn">生成 QR Code</button>
+              <button type="button" class="btn btn-success" id="sendToLineBtn">傳送至官方Line</button>
             </div>
           </div>
         </div>
@@ -293,6 +297,7 @@
     <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.13.6/js/standalone/selectize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="sizeModal.js"></script>
     <script src="scripts.js"></script>
     <script>

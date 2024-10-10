@@ -4,7 +4,7 @@
     let materialsData = []; // 存儲材質資料
     let materialAreaSums = {}; // 追踪每個材質的面積總和
 
-    // 初始化應用
+    // ===== 初始化模組 =====
     document.addEventListener('DOMContentLoaded', async function() {
         try {
             await initializeApp();
@@ -13,57 +13,61 @@
         }
     });
 
-    // ===== 初始化模組 =====
     async function initializeApp() {
         try {
-            const materials = await fetchMaterialsData();
-            if (materials && materials.length > 0) {
-                materialsData = materials;
-                await MaterialSelect.init(materials);
-            } else {
-                console.warn('未能獲取材料數據');
-            }
-            
+            await loadMaterialsData();
             initializeEventHandlers();
             initializeSizeModal();
             initializeTooltips();
             updateTotals();
             initializeLineButtons();
+            initializeMaterialSelect();
+            initializeFormSubmission();
+            initializeModal();
         } catch (error) {
             console.error('初始化過程中發生錯誤:', error);
         }
     }
 
+    // ===== 材質資料載入模組 =====
+    async function loadMaterialsData() {
+        try {
+            const response = await fetch('materials.json');
+            materialsData = await response.json();
+            await MaterialSelect.init(materialsData);
+        } catch (error) {
+            console.error('無法加載材質資料:', error);
+            materialsData = [];
+        }
+    }
+
+    // ===== 事件處理模組 =====
     function initializeEventHandlers() {
         document.querySelector('.btn-add-dimension').addEventListener('click', handleAddDimension);
         document.getElementById('calculatorForm').addEventListener('submit', handleFormSubmission);
         document.querySelector('button[type="reset"]').addEventListener('click', resetForm);
         document.getElementById('dimensionContainer').addEventListener('click', handleDimensionContainerClick);
         document.getElementById('clearAllBtn').addEventListener('click', handleClearAll);
+        
         const remarksSubmitBtn = document.getElementById('remarksSubmitBtn');
         if (remarksSubmitBtn) {
             remarksSubmitBtn.addEventListener('click', handleRemarksSubmission);
         }
+
         const remarksResetBtn = document.getElementById('remarksResetBtn');
         if (remarksResetBtn) {
             remarksResetBtn.addEventListener('click', resetRemarks);
         }
+
         const deliveryOptions = document.querySelectorAll('input[name="deliveryOption"]');
         deliveryOptions.forEach(option => {
             option.addEventListener('change', toggleShippingDetails);
         });
-        
-        // 為快遞取件選項添加 tooltip
-        const courierOption = document.getElementById('courier');
-        if (courierOption) {
-            const tooltipIcon = courierOption.nextElementSibling.querySelector('.fa-info-circle');
-            if (tooltipIcon) {
-                tooltipIcon.setAttribute('data-bs-toggle', 'tooltip');
-                tooltipIcon.setAttribute('data-bs-placement', 'top');
-                tooltipIcon.setAttribute('title', '請由客戶自行叫車');
-            }
-        }
 
+        initializePickupDateListener();
+    }
+
+    function initializePickupDateListener() {
         const pickupDateOption = document.getElementById('pickupDateOption');
         const pickupDateInputContainer = document.getElementById('pickupDateInputContainer');
 
@@ -77,28 +81,22 @@
         }
     }
 
-    // ===== 材質資料載入模組 =====
-    function fetchMaterialsData() {
-        return fetch('materials.json')
-            .then(response => response.json())
-            .then(data => {
-                materialsData = data;
-                return data;
-            })
-            .catch(error => {
-                console.error('無法加載材質資料:', error);
-                return [];
-            });
-    }
-
     // ===== 材質選擇模組 =====
     const MaterialSelect = (function () {
         const DELIMITER = '+';
-        let dropdownVisible = false;
         let selectedIndex = -1;
-    
+
         async function init(materials) {
             try {
+                createMaterialSelectUI();
+                bindMaterialSelectEvents(materials);
+                updateDropdown(materials, '');
+            } catch (error) {
+                console.error('初始化材質選擇器時發生錯誤:', error);
+            }
+        }
+
+        function createMaterialSelectUI() {
             const wrapper = document.createElement('div');
             wrapper.className = 'material-select-wrapper';
             
@@ -116,36 +114,27 @@
             const container = document.getElementById('materialSelectContainer');
             container.innerHTML = ''; // 清空容器
             container.appendChild(wrapper);
-    
+        }
+
+        function bindMaterialSelectEvents(materials) {
+            const input = document.querySelector('.material-select-input');
+            const wrapper = document.querySelector('.material-select-wrapper');
+
             input.addEventListener('input', () => updateDropdown(materials, input.value));
             input.addEventListener('focus', () => showDropdown(materials, input.value));
             input.addEventListener('blur', () => setTimeout(hideDropdown, 200));
             input.addEventListener('keydown', (e) => handleKeyDown(e, materials));
-    
+
             document.addEventListener('click', (e) => {
                 if (!wrapper.contains(e.target)) hideDropdown();
             });
-    
-            updateDropdown(materials, '');
-            await new Promise(resolve => {
-                requestAnimationFrame(() => {
-                    const input = document.querySelector('.material-select-input');
-                    if (input && window.getComputedStyle(input).width !== '100%') {
-                        console.warn('材質選擇器樣式可能未正確應用');
-                    }
-                    resolve();
-                });
-            });
-        } catch (error) {
-            console.error('初始化材質選擇器時發生錯誤:', error);
         }
-        }
-    
+
         function updateDropdown(materials, query) {
             const dropdown = document.querySelector('.material-select-dropdown');
             dropdown.innerHTML = '';
             const filteredMaterials = materials.filter(m => customScore(query, m) > 0);
-    
+
             filteredMaterials.forEach((material, index) => {
                 const li = document.createElement('li');
                 li.textContent = material.name;
@@ -157,7 +146,7 @@
                 });
                 dropdown.appendChild(li);
             });
-    
+
             if (filteredMaterials.length > 0) {
                 showDropdown();
             } else {
@@ -167,29 +156,27 @@
             selectedIndex = -1;
             updateSelectedItem();
         }
-    
+
         function showDropdown() {
             const dropdown = document.querySelector('.material-select-dropdown');
             dropdown.style.display = 'block';
-            dropdownVisible = true;
         }
-    
+
         function hideDropdown() {
             const dropdown = document.querySelector('.material-select-dropdown');
             dropdown.style.display = 'none';
-            dropdownVisible = false;
         }
-    
+
         function selectMaterial(materialName) {
             const input = document.querySelector('.material-select-input');
             input.value = materialName;
             hideDropdown();
         }
-    
+
         function handleKeyDown(event, materials) {
             const dropdown = document.querySelector('.material-select-dropdown');
             const items = dropdown.querySelectorAll('li');
-    
+
             switch (event.key) {
                 case 'ArrowDown':
                     event.preventDefault();
@@ -215,7 +202,7 @@
                     break;
             }
         }
-    
+
         function updateSelectedItem() {
             const items = document.querySelectorAll('.material-select-dropdown li');
             items.forEach((item, index) => {
@@ -227,20 +214,20 @@
                 }
             });
         }
-    
+
         function customScore(search, item) {
             if (!search) return 1;
             search = search.toLowerCase();
             const itemText = item.name.toLowerCase();
-    
+
             if (itemText === search) return 4;
             if (itemText.startsWith(search)) return 3;
             if (itemText.includes(search)) return 2;
-    
+
             if (search.includes(DELIMITER)) {
                 const searchParts = search.split(DELIMITER);
                 const itemParts = itemText.split(DELIMITER);
-    
+
                 for (let i = 0; i < searchParts.length; i++) {
                     if (!itemParts[i] || !itemParts[i].startsWith(searchParts[i])) {
                         return 0;
@@ -248,13 +235,13 @@
                 }
                 return 3;
             }
-    
+
             return 0;
         }
-    
+
         return { init };
     })();
-    
+
     // ===== 尺寸組管理模組 =====
     function handleAddDimension() {
         manageDimensionGroups('add');
@@ -311,50 +298,57 @@
     }
 
     // ===== 表單提交模組 =====
+    function initializeFormSubmission() {
+        const form = document.getElementById('calculatorForm');
+        if (form) {
+            form.addEventListener('submit', handleFormSubmission);
+        }
+    }
+
     function handleFormSubmission(event) {
         event.preventDefault();
-    
+
         const material = document.querySelector('.material-select-input').value;
-    
+
         if (!material) {
             alert('請選擇有效的材質！');
             return;
         }
-    
+
         let materialPrice = getMaterialPrice(material);
         let materialDiscountPrice = getMaterialPrice(material, true);
-    
+
         if (materialPrice === 0) {
             alert(`錯誤：無效的材質 "${material}"。請選擇下拉式選單中的材質。`);
             return;
         }
-    
+
         const dimensions = getDimensions();
         if (!validateDimensions(dimensions)) {
             alert('請填寫有效的尺寸和數量！');
             return;
         }
-    
+
         if (dimensions.length === 0) {
             alert('請至少添加一組尺寸和數量！');
             return;
         }
-    
+
         const isTrimChecked = document.getElementById('trimCheckbox').checked;
         const isSpecialCutting = material.includes("裁小模") || material.includes("輪廓裁型") || material.includes("合成板裁型");
-    
+
         const tableBody = document.getElementById('resultTable').querySelector('tbody');
         const initialRowCount = tableBody.children.length;
-    
+
         dimensions.forEach(dimension => {
             updateMaterialAreaSums(material, dimension.length, dimension.width, dimension.quantity, isSpecialCutting || isTrimChecked);
             const totalAmount = calculateAmount(dimension.length, dimension.width, dimension.quantity, material, materialPrice, materialDiscountPrice, isTrimChecked);
             addRowToTable(material, dimension, totalAmount, isTrimChecked);
         });
-    
+
         updateAllRowsInTable();
         resetForm();
-    
+
         if (tableBody.children.length > initialRowCount) {
             const lastAddedRow = tableBody.children[tableBody.children.length - 1];
             setTimeout(() => {
@@ -699,17 +693,6 @@
         
         const modal = new bootstrap.Modal(document.getElementById('outputModal'));
         modal.show();
-
-        modal._element.addEventListener('shown.bs.modal', function () {
-            const copyTextBtn = document.getElementById('copyTextBtn');
-            const sendToLineBtn = document.getElementById('sendToLineBtn');
-            if (copyTextBtn) {
-                copyTextBtn.addEventListener('click', () => copyToClipboard(document.getElementById('modalContent').textContent));
-            }
-            if (sendToLineBtn) {
-                sendToLineBtn.addEventListener('click', showLineOptions);
-            }
-        });
     }
 
     function generateOutputContent() {
@@ -763,7 +746,7 @@
             case 'urgent':
                 pickupDateText = '急件當日取件';
                 break;
-            case 'specified':
+                case 'specified':
                 const specifiedDate = document.getElementById('pickupDate')?.value || '';
                 pickupDateText = specifiedDate ? `指定日期: ${specifiedDate}` : '指定日期: 未選擇具體日期';
                 break;
@@ -786,58 +769,6 @@
         return content.trim() === '※備註' ? '' : content;
     }
 
-    function copyModalContent() {
-        const modalContent = document.getElementById('modalContent');
-        if (!modalContent) {
-            console.error('模態內容元素未找到');
-            alert('無法找到要複製的內容');
-            return;
-        }
-        
-        const textToCopy = modalContent.textContent;
-        
-        if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(textToCopy)
-                .then(() => {
-                    alert('文字已複製到剪貼板！');
-                })
-                .catch(err => {
-                    console.error('複製失敗:', err);
-                    alert('複製失敗，請手動複製文字。');
-                });
-        } else {
-            fallbackCopyTextToClipboard(textToCopy);
-        }
-    }
-
-    function fallbackCopyTextToClipboard(text) {
-        const textArea = document.createElement("textarea");
-        textArea.value = text;
-        
-        textArea.style.top = "0";
-        textArea.style.left = "0";
-        textArea.style.position = "fixed";
-    
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-    
-        try {
-            const successful = document.execCommand('copy');
-            if (successful) {
-                alert('文字已複製到剪貼板！');
-            } else {
-                console.error('複製失敗（使用fallback方法）');
-                alert('複製失敗，請手動複製文字。');
-            }
-        } catch (err) {
-            console.error('複製過程中發生錯誤:', err);
-            alert('複製失敗，請手動複製文字。');
-        }
-    
-        document.body.removeChild(textArea);
-    }
-    
     function toggleShippingDetails() {
         const shippingDetails = document.getElementById('shippingDetails');
         const isShipping = document.getElementById('shipping').checked;
@@ -859,6 +790,7 @@
         document.getElementById('shippingDetails').style.display = 'none';
     }
 
+    // ===== LINE 分享功能模組 =====
     function initializeLineButtons() {
         const sendToLineBtn = document.getElementById('sendToLineBtn');
         if (sendToLineBtn) {
@@ -868,134 +800,161 @@
 
     function handleSendToLine() {
         const deviceType = detectDevice();
-        const modalContent = document.getElementById('modalContent').textContent;
-        copyToClipboard(modalContent);
-    
-        if (deviceType === 'desktop') {
-            sendToDesktopLine(modalContent);
-        } else {
-            sendToMobileLine(modalContent);
-        }
-
-        const sendButton = document.getElementById('sendToLineBtn');
-        sendButton.textContent = '正在打開 LINE...';
-        sendButton.disabled = true;
+        const modalContent = document.getElementById('modalContent');
         
-        setTimeout(() => {
-            sendButton.textContent = '傳送至官方 Line';
-            sendButton.disabled = false;
-        }, 5000);
+        if (modalContent && modalContent.textContent.trim() !== '') {
+            const content = modalContent.textContent;
+            
+            if (deviceType === 'desktop') {
+                handleCopyContent();
+                alert('內容已複製到剪貼板。請手動將內容貼上到 LINE 中發送。');
+            } else {
+                const lineUrl = generateMessageLink(content);
+                window.open(lineUrl, '_blank');
+            }
+        } else {
+            alert('沒有可用的內容來複製或分享');
+        }
+    }
+
+    function handleCopyContent() {
+        const modalContent = document.getElementById('modalContent');
+        
+        if (modalContent && modalContent.textContent.trim() !== '') {
+            const content = modalContent.textContent;
+            
+            navigator.clipboard.writeText(content).then(() => {
+                alert('內容已成功複製到剪貼板！');
+            }).catch(err => {
+                console.error('複製失敗:', err);
+                alert('複製失敗，請手動選擇並複製內容。');
+            });
+        } else {
+            alert('沒有可複製的內容');
+        }
+    }
+
+    function initializeModal() {
+        const generateQRBtn = document.getElementById('generateQRBtn');
+        const copyTextBtn = document.getElementById('copyTextBtn');
+        const sendToLineBtn = document.getElementById('sendToLineBtn');
+        
+        if (generateQRBtn) {
+            generateQRBtn.addEventListener('click', handleGenerateQR);
+        }
+        if (copyTextBtn) {
+            copyTextBtn.addEventListener('click', handleCopyContent);
+        }
+        if (sendToLineBtn) {
+            sendToLineBtn.addEventListener('click', handleSendToLine);
+        }
+    }
+    
+    function handleGenerateQR() {
+        const content = document.getElementById('modalContent').textContent;
+        showQRCodes(content);
+    }
+    
+    function showQRCodes(content) {
+        const qrCodeContainer = document.getElementById('qrCodeContainer');
+        const copyContentQRElement = document.getElementById('copyContentQR');
+        qrCodeContainer.style.display = 'block';
+        
+        copyContentQRElement.innerHTML = '';
+        
+        if (content && content.trim() !== '') {
+            const limitedContent = limitQRCodeContent(content);
+            new QRCode(copyContentQRElement, {
+                text: limitedContent,
+                width: 200,
+                height: 200,
+                correctLevel : QRCode.CorrectLevel.M
+            });
+    
+            const enlargeButton = document.getElementById('enlargeCopyQR');
+            if (enlargeButton) {
+                enlargeButton.style.display = 'inline-block';
+                enlargeButton.onclick = function() {
+                    enlargeQRCode(limitedContent);
+                };
+            }
+        } else {
+            copyContentQRElement.textContent = '無可用內容生成 QR 碼';
+            const enlargeButton = document.getElementById('enlargeCopyQR');
+            if (enlargeButton) {
+                enlargeButton.style.display = 'none';
+            }
+        }
+    }
+    
+    function enlargeQRCode(content) {
+        const modal = document.createElement('div');
+        modal.style.position = 'fixed';
+        modal.style.left = '0';
+        modal.style.top = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.backgroundColor = 'rgba(0,0,0,0.8)';
+        modal.style.display = 'flex';
+        modal.style.justifyContent = 'center';
+        modal.style.alignItems = 'center';
+        modal.style.zIndex = '1000';
+    
+        const qrContainer = document.createElement('div');
+        qrContainer.style.backgroundColor = 'white';
+        qrContainer.style.padding = '20px';
+        qrContainer.style.borderRadius = '10px';
+    
+        const enlargedQR = document.createElement('div');
+        new QRCode(enlargedQR, {
+            text: content,
+            width: 300,
+            height: 300,
+            correctLevel : QRCode.CorrectLevel.M
+        });
+    
+        const closeButton = document.createElement('button');
+        closeButton.textContent = '關閉';
+        closeButton.className = 'btn btn-secondary mt-2';
+        closeButton.onclick = () => document.body.removeChild(modal);
+    
+        qrContainer.appendChild(enlargedQR);
+        qrContainer.appendChild(closeButton);
+        modal.appendChild(qrContainer);
+        document.body.appendChild(modal);
+    }
+    
+    function updateModalUI() {
+        const modalFooter = document.querySelector('#outputModal .modal-footer');
+        const copyButton = document.createElement('button');
+        copyButton.className = 'btn btn-primary';
+        copyButton.textContent = '複製內容';
+        copyButton.onclick = handleCopyContent;
+        modalFooter.insertBefore(copyButton, modalFooter.firstChild);
     }
 
     function detectDevice() {
         const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-        if (/android/i.test(userAgent)) {
-            return 'mobile';
-        }
-        if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+        if (/android/i.test(userAgent) || /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
             return 'mobile';
         }
         return 'desktop';
     }
 
-    function showLineOptions() {
-        try {
-            const lineOptions = document.getElementById('lineOptions');
-            if (!lineOptions) {
-                console.error('無法找到 lineOptions 元素');
-                return;
-            }
-            lineOptions.style.display = 'block';
-            generateQRCode();
-        } catch (error) {
-            console.error('顯示 LINE 選項時發生錯誤:', error);
-            alert('顯示選項時發生錯誤，請稍後再試。');
-        }
-    }
-
-    function sendToDesktopLine(content) {
-        const lineProtocolUrl = `line://msg/text/?${encodeURIComponent(content)}`;
-        
-        // 嘗試打開桌面版 LINE
-        window.location.href = lineProtocolUrl;
-        
-        // 如果 5 秒後頁面還在，說明可能沒有安裝 LINE 或打開失敗
-        setTimeout(() => {
-            if (!document.hidden) {
-                alert('無法打開桌面版 LINE。請確保您已安裝 LINE，或手動打開 LINE 並貼上已複製的內容。');
-                showQRCode(content);
-            }
-        }, 5000);
-    }
-
-    function sendToMobileLine(content) {
-        const lineOfficialAccountUrl = 'https://line.me/R/oaMessage/@vcprint/';
-        const encodedMessage = encodeURIComponent(content);
-        const url = `${lineOfficialAccountUrl}?${encodedMessage}`;
-        
-        // 嘗試打開 LINE
-        window.location.href = url;
-        
-        // 如果 3 秒後頁面還在，提示用戶
-        setTimeout(() => {
-            if (!document.hidden) {
-                alert('如果 LINE 沒有自動打開，請手動打開 LINE 並貼上已複製的訊息內容。');
-            }
-        }, 3000);
+    function generateMessageLink(content) {
+        const lineOfficialAccountUrl = 'https://line.me/R/ti/p/@vcprint';
+        const encodedMessage = encodeURIComponent(limitQRCodeContent(content));
+        return `${lineOfficialAccountUrl}?text=${encodedMessage}`;
     }
     
-    function showQRCode(content) {
-        // 生成包含內容的 QR 碼
-        const qrCodeContainer = document.getElementById('qrCodeContainer');
-        qrCodeContainer.innerHTML = ''; // 清除之前的 QR Code
-        
-        new QRCode(qrCodeContainer, {
-            text: `https://line.me/R/oaMessage/@vcprint/?${encodeURIComponent(content)}`,
-            width: 128,
-            height: 128
-        });
-        
-        qrCodeContainer.style.display = 'block';
-    }
-
-    function generateQRCode() {
-        const modalContent = document.getElementById('modalContent').textContent;
-        const lineOfficialAccountUrl = 'https://line.me/R/ti/p/@vcprint';
-        const qrCodeContainer = document.getElementById('qrCode');
-        qrCodeContainer.innerHTML = ''; // 清除之前的 QR Code
-        
-        new QRCode(qrCodeContainer, {
-            text: `${lineOfficialAccountUrl}?${encodeURIComponent(modalContent)}`,
-            width: 128,
-            height: 128
-        });
-    }
-
-    function copyToClipboard(text) {
-        if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(text).then(() => {
-                console.log('文字已成功複製到剪貼板');
-            }).catch(err => {
-                console.error('複製到剪貼板失敗:', err);
-            });
-        } else {
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            textArea.style.position = "fixed";
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            try {
-                document.execCommand('copy');
-                console.log('文字已成功複製到剪貼板');
-            } catch (err) {
-                console.error('複製到剪貼板失敗:', err);
-            }
-            document.body.removeChild(textArea);
+    function limitQRCodeContent(content, maxLength = 1000) {
+        if (content.length <= maxLength) {
+            return content;
         }
+        return content.substr(0, maxLength) + '...（內容已截斷）';
     }
 
-    // 公開需要在全局範圍內訪問的函數
+    // ===== 公開 API =====
     window.fillExistingGroup = function(length, width, selectedGroupIndex) {
         const selectedGroup = document.querySelectorAll('.dimension-group')[selectedGroupIndex];
         if (selectedGroup) {
@@ -1010,6 +969,6 @@
         dimensionContainer.appendChild(newDimensionGroup);
         updateGroupSelection();
         updateDimensionNumbers();
-    }
+    };
 
 })();

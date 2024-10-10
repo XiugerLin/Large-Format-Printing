@@ -913,13 +913,32 @@ body {
 
 #qrCodeContainer {
     background-color: #f8f9fa;
-    border-radius: 5px;
-    padding: 15px;
-    margin-top: 15px;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-#qrCode {
+#qrCodeContainer img {
+    max-width: 200px;
+    height: auto;
     margin: 0 auto;
+}
+
+#qrCodeContainer p {
+    margin-top: 15px;
+    color: #333;
+}
+
+#qrCodeContainer .small {
+    font-size: 0.85em;
+    color: #666;
+}
+
+@media (max-width: 768px) {
+    #qrCodeContainer {
+        display: none !important;
+    }
 }
 
 #copyTextBtn {
