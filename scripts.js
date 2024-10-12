@@ -3,6 +3,7 @@
     // ===== 全局變量 =====
     let materialsData = []; // 存儲材質資料
     let materialAreaSums = {}; // 追踪每個材質的面積總和
+    let clearAllButtonContainer;
 
     // ===== 初始化模組 =====
     document.addEventListener('DOMContentLoaded', async function() {
@@ -12,6 +13,41 @@
             await initializeApp();
         } catch (error) {
             console.error('初始化過程中發生錯誤:', error);
+        }
+        const clearAllBtn = document.getElementById('clearAllBtn');
+        if (clearAllBtn) {
+            clearAllBtn.addEventListener('click', handleClearAll);
+        }
+        const pickupDateOption = document.getElementById('pickupDateOption');
+        if (pickupDateOption) {
+            pickupDateOption.value = '';
+        }
+        const storeInfoContent = document.getElementById('storeInfoContent');
+        const toggleButton = document.querySelector('#storeInfoHeader .toggle-btn');
+        
+        if (storeInfoContent && toggleButton) {
+            toggleButton.addEventListener('click', function() {
+                this.classList.toggle('active');
+                if (storeInfoContent.classList.contains('show')) {
+                    storeInfoContent.style.maxHeight = storeInfoContent.scrollHeight + "px";
+                    setTimeout(function() {
+                        storeInfoContent.style.maxHeight = "0px";
+                    }, 10);
+                } else {
+                    storeInfoContent.style.maxHeight = storeInfoContent.scrollHeight + "px";
+                }
+            });
+    
+            // 添加鼠標懸停效果
+            const infoItems = document.querySelectorAll('.info-item');
+            infoItems.forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.05)';
+                });
+                item.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
         }
     });
 
@@ -23,10 +59,11 @@
             initializeTooltips();
             updateTotals();
             initializeLineButtons();
-            initializeMaterialSelect();
             initializeFormSubmission();
             initializeModal();
-            initializeEventHandlers();
+            clearAllButtonContainer = document.getElementById('clearAllButtonContainer');
+            updateClearAllButtonVisibility();
+            initializeDatePicker();
         } catch (error) {
             console.error('初始化過程中發生錯誤:', error);
         }
@@ -85,19 +122,53 @@
             updateDimensionNumbers();
         }
     }
+
     function initializePickupDateListener() {
         const pickupDateOption = document.getElementById('pickupDateOption');
         const pickupDateInputContainer = document.getElementById('pickupDateInputContainer');
-
+        const dateWarning = document.getElementById('dateWarning');
+        const pickupDate = document.getElementById('pickupDate');
+        const standardShippingNote = document.getElementById('standardShippingNote');
+    
         if (pickupDateOption && pickupDateInputContainer) {
             pickupDateOption.addEventListener('change', function () {
-                pickupDateInputContainer.style.display = this.value === 'specified' ? 'block' : 'none';
-                if (this.value !== 'specified') {
-                    document.getElementById('pickupDate').value = '';
+                if (this.value === 'urgent') {
+                    dateWarning.style.display = 'block';
+                    pickupDateInputContainer.style.display = 'none';
+                    standardShippingNote.style.display = 'none';
+                    pickupDate.value = '';
+                } else if (this.value === 'specified') {
+                    pickupDateInputContainer.style.display = 'block';
+                    standardShippingNote.style.display = 'none';
+                } else if (this.value === 'standard'){
+                    pickupDateInputContainer.style.display = 'none';
+                    dateWarning.style.display = 'none';
+                    standardShippingNote.style.display = 'block';
+                    pickupDate.value = '';
+                } else {
+                    pickupDateInputContainer.style.display = 'none';
+                    dateWarning.style.display = 'none';
+                    standardShippingNote.style.display = 'none';
+                    pickupDate.value = '';
+                }
+            });
+    
+            pickupDate.addEventListener('change', function () {
+                if (pickupDate.value) {
+                    const today = new Date();
+                    const selectedDate = new Date(pickupDate.value);
+                    const diffTime = selectedDate - today;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+                    if (diffDays <= 3) {
+                        dateWarning.style.display = 'block';
+                    } else {
+                        dateWarning.style.display = 'none';
+                    }
                 }
             });
         }
-    }
+    }    
 
     // ===== 材質選擇模組 =====
     const MaterialSelect = (function () {
@@ -116,7 +187,7 @@
 
         function createMaterialSelectUI() {
             const wrapper = document.createElement('div');
-            wrapper.className = 'material-select-wrapper';
+            wrapper.className = 'material-select-wrapper position-relative'; // 加入相對定位，方便放置 "xx" 按鈕
             
             const input = document.createElement('input');
             input.type = 'text';
@@ -126,27 +197,62 @@
             const dropdown = document.createElement('ul');
             dropdown.className = 'material-select-dropdown';
             
+            // 清除 "xx" 按鈕
+            const clearBtn = document.createElement('button');
+            clearBtn.type = 'button';
+            clearBtn.className = 'clear-btn';
+            clearBtn.innerHTML = '&times;'; // 使用 "×" 符號
+            
+            // 當點擊 "xx" 按鈕時，清空輸入框
+            clearBtn.addEventListener('click', () => {
+                input.value = ''; // 清空輸入框
+                hideDropdown(); // 隱藏下拉選單
+            });
+            
             wrapper.appendChild(input);
+            wrapper.appendChild(clearBtn); // 加入清除按鈕到輸入框中
             wrapper.appendChild(dropdown);
             
             const container = document.getElementById('materialSelectContainer');
             container.innerHTML = ''; // 清空容器
             container.appendChild(wrapper);
         }
+        
 
         function bindMaterialSelectEvents(materials) {
             const input = document.querySelector('.material-select-input');
             const wrapper = document.querySelector('.material-select-wrapper');
-
+            const dropdown = document.querySelector('.material-select-dropdown');
+        
             input.addEventListener('input', () => updateDropdown(materials, input.value));
             input.addEventListener('focus', () => showDropdown(materials, input.value));
-            input.addEventListener('blur', () => setTimeout(hideDropdown, 200));
-            input.addEventListener('keydown', (e) => handleKeyDown(e, materials));
+        
+            input.removeEventListener('blur', hideDropdown);
+        
+            document.addEventListener('mousedown', (e) => {
+                const isClickInside = wrapper.contains(e.target);
+                const isOnScrollbar = e.target === dropdown && dropdown.scrollHeight > dropdown.clientHeight;
+        
+                if (!isClickInside && !isOnScrollbar) {
+                    hideDropdown();
+                }
+            });
 
-            document.addEventListener('click', (e) => {
-                if (!wrapper.contains(e.target)) hideDropdown();
+            dropdown.addEventListener('mousedown', (e) => {
+                if (e.target.tagName === 'LI') {
+                    selectMaterial(e.target.textContent);
+                    e.preventDefault();
+                }
+            });
+        
+            dropdown.addEventListener('mousedown', (e) => {
+                const isOnScrollbar = dropdown.scrollHeight > dropdown.clientHeight && e.offsetX > dropdown.clientWidth;
+                if (isOnScrollbar) {
+                    e.stopPropagation();
+                }
             });
         }
+        
 
         function updateDropdown(materials, query) {
             const dropdown = document.querySelector('.material-select-dropdown');
@@ -265,11 +371,6 @@
         manageDimensionGroups('add');
     }
 
-    function handleDimensionContainerClick(event) {
-        const removeBtn = event.target.closest('.btn-remove-dimension');
-        if (removeBtn) manageDimensionGroups('remove', removeBtn);
-    }
-
     function manageDimensionGroups(action, element) {
         const dimensionContainer = document.getElementById('dimensionContainer');
         if (action === 'add') {
@@ -294,8 +395,18 @@
                 <i class="fa fa-trash" aria-hidden="true"></i>
             </button>
         `;
+    
+        const dimensionContainer = document.getElementById('dimensionContainer');
+        dimensionContainer.appendChild(group);
+    
+        // 將容器滾動到最底部，顯示最新的尺寸組
+        setTimeout(() => {
+            dimensionContainer.scrollTop = dimensionContainer.scrollHeight;
+        }, 100); // 加入少量延遲，確保新增的元素已被插入 DOM
+    
         return group;
     }
+    
 
     function updateGroupSelection() {
         const selectGroup = document.getElementById('selectGroup');
@@ -480,6 +591,7 @@
             newRow.remove();
             updateAllRowsInTable();
             updateTotals();
+            updateClearAllButtonVisibility()
         });
 
         newRow.style.opacity = '0';
@@ -544,6 +656,16 @@
         updateRowColors(rows, materialTotals);
         initializeTooltips();
         updateTotals();
+        updateClearAllButtonVisibility();
+    }
+    
+    function updateClearAllButtonVisibility() {
+        const rows = document.querySelectorAll('#resultTable tbody tr');
+        if (rows.length > 0) {
+            clearAllButtonContainer.style.display = 'block';
+        } else {
+            clearAllButtonContainer.style.display = 'none';
+        }
     }
 
     function updateRowColors(rows, materialTotals) {
@@ -681,6 +803,7 @@
             tableBody.innerHTML = '';
             materialAreaSums = {}; // 重置材質面積總和
             updateTotals(); // 更新總計
+            updateClearAllButtonVisibility(); // 更新按鈕可見性
         }
     }
 
@@ -787,28 +910,35 @@
         const pickupDateOption = document.getElementById('pickupDateOption')?.value || '';
         const deliveryMethod = document.querySelector('input[name="deliveryOption"]:checked')?.value || '';
         const otherRemarks = document.getElementById('otherRemarks')?.value || '';
-
+    
         let content = '※備註\n';
         if (otherProcessing) content += `其他加工: ${otherProcessing}\n`;
         
-        // 處理取貨日期
-        let pickupDateText = '';
-        switch (pickupDateOption) {
-            case 'unspecified':
-                pickupDateText = '不指定';
-                break;
-            case 'urgent':
-                pickupDateText = '急件當日取件';
-                break;
+        // 處理希望取貨日期
+        if (pickupDateOption && pickupDateOption !== '') {
+            let pickupDateText = '';
+            switch (pickupDateOption) {
+                case 'standard':
+                    pickupDateText = '依標準作業時間出貨';
+                    break;
+                case 'urgent':
+                    pickupDateText = '急件當日取件';
+                    break;
                 case 'specified':
-                const specifiedDate = document.getElementById('pickupDate')?.value || '';
-                pickupDateText = specifiedDate ? `指定日期: ${specifiedDate}` : '指定日期: 未選擇具體日期';
-                break;
-            default:
-                pickupDateText = '未選擇';
+                    const specifiedDate = document.getElementById('pickupDate')?.value || '';
+                    if (specifiedDate) {
+                        const date = new Date(specifiedDate);
+                        pickupDateText = date.toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '/');
+                    } else {
+                        pickupDateText = '未選擇具體日期';
+                    }
+                    break;
+            }
+            if (pickupDateText) {
+                content += `希望取貨日期: ${pickupDateText}\n`;
+            }
         }
-        content += `取貨日期: ${pickupDateText}\n`;
-
+    
         if (deliveryMethod) content += `取貨方式: ${deliveryMethod}\n`;
         if (deliveryMethod === '郵寄/貨運') {
             const contactPerson = document.getElementById('contactPerson')?.value || '';
@@ -819,8 +949,48 @@
             if (address) content += `地址: ${address}\n`;
         }
         if (otherRemarks) content += `其他: ${otherRemarks}\n`;
-
+    
         return content.trim() === '※備註' ? '' : content;
+    }
+
+    function initializeDatePicker() {
+        const dateOptionSelect = document.getElementById('pickupDateOption');
+        const dateInput = document.getElementById('pickupDate');
+        const dateWarning = document.getElementById('dateWarning');
+        const dateInputContainer = document.getElementById('pickupDateInputContainer');
+    
+        if (!dateOptionSelect || !dateInput || !dateWarning || !dateInputContainer) {
+            console.error('One or more elements not found');
+            return;
+        }
+    
+        const today = new Date();
+        dateInput.min = today.toISOString().split('T')[0];
+    
+        dateOptionSelect.addEventListener('change', function() {
+            const selectedOption = this.value;
+            dateWarning.classList.remove('show');
+            dateInputContainer.style.display = 'none';
+    
+            if (selectedOption === 'specified') {
+                dateInputContainer.style.display = 'block';
+                dateInput.value = '';
+            } else if (selectedOption === 'urgent') {
+                dateWarning.classList.add('show');
+                console.log('Urgent option selected, warnings should be visible');
+            }
+        });
+    
+        dateInput.addEventListener('change', function() {
+            const selectedDate = new Date(this.value);
+            const diffDays = Math.ceil((selectedDate - today) / (1000 * 60 * 60 * 24));
+    
+            if (diffDays <= 3) {
+                dateWarning.classList.add('show');
+            } else {
+                dateWarning.classList.remove('show');
+            }
+        });
     }
 
     function toggleShippingDetails() {

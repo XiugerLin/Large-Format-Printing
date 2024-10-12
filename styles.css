@@ -57,10 +57,18 @@ body {
     color: #333;
     line-height: 1.8;
     animation: fadeIn 0.5s ease-out;
+    padding-top: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 /* ===== 3. 通用元素樣式 ===== */
-a, button, input, select, textarea {
+a,
+button,
+input,
+select,
+textarea {
     transition: all var(--transition-duration) ease;
 }
 
@@ -92,16 +100,75 @@ textarea:focus {
     transform: translateY(0);
 }
 
+.page-header {
+    background: linear-gradient(145deg, rgba(255, 111, 0, 0.1), rgba(255, 187, 0, 0.1));
+    padding: 20px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo-container {
+    flex-shrink: 0;
+}
+
+.company-logo {
+    max-height: 60px;
+    width: auto;
+    display: block;
+}
+
+.page-title {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin: 0;
+    font-weight: 700;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    flex-grow: 1;
+}
+
+.flex-grow-1 {
+    flex-grow: 1;
+}
+
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .logo-container {
+        margin-bottom: 10px;
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+    }
+
+    .flex-grow-1 {
+        display: none;
+    }
+}
+
 /* ===== 4. 表單樣式 ===== */
 .custom-form {
     background: linear-gradient(145deg, rgba(255, 111, 0, 0.1), rgba(255, 187, 0, 0.1));
-    padding: 30px;
+    padding: 20px;
     border-radius: var(--border-radius-large);
     box-shadow: var(--box-shadow-default);
     max-width: 550px;
     margin: 0 auto;
     animation: fadeIn 1s ease-in-out;
     transition: all var(--transition-duration) ease;
+    overflow: visible;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .custom-form:hover {
@@ -116,6 +183,25 @@ textarea:focus {
     border-bottom: 3px solid var(--primary-color);
     padding-bottom: 10px;
     text-align: center;
+}
+
+.clear-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 24px;
+    color: black;
+    /* 可以根據需求調整顏色 */
+    transition: color 0.3s ease;
+}
+
+.clear-btn:hover {
+    color: #ff6f00;
+    /* 清除按鈕 hover 狀態下的顏色 */
 }
 
 .custom-form .form-label {
@@ -237,7 +323,7 @@ textarea:focus {
 .custom-form .form-footer {
     display: flex;
     justify-content: space-between;
-    margin-top: 30px;
+    margin-top: auto
 }
 
 .custom-form .form-footer .btn {
@@ -371,17 +457,34 @@ textarea:focus {
 }
 
 .output-list-table th:nth-child(1),
-.output-list-table td:nth-child(1) { width: 45%; }
+.output-list-table td:nth-child(1) {
+    width: 45%;
+}
+
 .output-list-table th:nth-child(2),
-.output-list-table td:nth-child(2) { width: 15%; }
+.output-list-table td:nth-child(2) {
+    width: 15%;
+}
+
 .output-list-table th:nth-child(3),
-.output-list-table td:nth-child(3) { width: 10%; }
+.output-list-table td:nth-child(3) {
+    width: 10%;
+}
+
 .output-list-table th:nth-child(4),
-.output-list-table td:nth-child(4) { width: 10%; }
+.output-list-table td:nth-child(4) {
+    width: 10%;
+}
+
 .output-list-table th:nth-child(5),
-.output-list-table td:nth-child(5) { width: 10%; }
+.output-list-table td:nth-child(5) {
+    width: 10%;
+}
+
 .output-list-table th:nth-child(6),
-.output-list-table td:nth-child(6) { width: 10%; }
+.output-list-table td:nth-child(6) {
+    width: 10%;
+}
 
 .output-list-table tbody tr {
     transition: background-color var(--transition-duration) ease;
@@ -457,8 +560,8 @@ textarea:focus {
     border-right-color: inherit !important;
 }
 
-.tooltip-icon.text-danger + .tooltip .tooltip-inner,
-.tooltip-icon.text-danger + .tooltip .tooltip-arrow::before {
+.tooltip-icon.text-danger+.tooltip .tooltip-inner,
+.tooltip-icon.text-danger+.tooltip .tooltip-arrow::before {
     background-color: red !important;
 }
 
@@ -539,6 +642,9 @@ textarea:focus {
     list-style-type: none;
     padding: 0;
     margin: 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-color) var(--input-bg-color);
+
 }
 
 .material-select-dropdown li {
@@ -573,6 +679,11 @@ textarea:focus {
     cursor: default;
 }
 
+.custom-scrollbar-supported .material-select-dropdown {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-color) var(--input-bg-color);
+}
+
 .material-select-dropdown::-webkit-scrollbar {
     width: 8px;
 }
@@ -583,18 +694,19 @@ textarea:focus {
 }
 
 .material-select-dropdown::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
+    background-color: var(--primary-color);
     border-radius: 4px;
+    border: 2px solid var(--input-bg-color);
 }
 
 .material-select-dropdown::-webkit-scrollbar-thumb:hover {
-    background: var(--btn-primary-hover-bg);
+    background-color: var(--btn-primary-hover-bg);
 }
 
 /* ===== 11. 總計區域樣式 ===== */
 .total-section {
     margin-top: 20px;
-    margin-bottom: 40px;
+    margin-bottom: 20px;
     padding: 15px;
     background-color: #f8f9fa;
     border-radius: var(--border-radius-medium);
@@ -828,6 +940,117 @@ textarea:focus {
     margin-top: 10px;
 }
 
+#pickupDateOption {
+    white-space: normal;
+    word-wrap: break-word;
+    height: auto;
+    min-height: 50px;
+}
+
+#dateWarning {
+    display: none;
+    transition: opacity 0.3s ease-in-out;
+    opacity: 0;
+}
+
+#dateWarning.show {
+    display: block;
+    opacity: 1;
+}
+
+#dateWarning.show {
+    animation: warningPulse 2s infinite;
+}
+
+.footer {
+    background-color: #f8f9fa;
+    border-top: 3px solid var(--primary-color);
+    padding: 30px 0 0;
+    font-size: 0.9rem;
+}
+
+.footer-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.footer-section {
+    flex: 1;
+    min-width: 200px;
+    margin-bottom: 15px;
+    padding: 0 15px;
+}
+
+.footer-section h5 {
+    color: var(--primary-color);
+    font-size: 1rem;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.footer-section p {
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    color: #555;
+}
+
+.footer-section i {
+    margin-right: 8px;
+    color: var(--secondary-color);
+    width: 20px;
+    text-align: center;
+}
+
+.footer-section a {
+    color: #555;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-section a:hover {
+    color: var(--primary-color);
+}
+
+.footer-section.hours .hours-detail {
+    margin-left: 28px;
+    font-size: 0.8rem;
+    color: #777;
+}
+
+.footer-section.address a {
+    text-decoration: underline;
+    color: var(--primary-color);
+}
+
+.footer-section.address a:hover {
+    color: var(--secondary-color);
+}
+
+.footer-bottom {
+    background-color: #eee;
+    padding: 10px 0;
+    text-align: center;
+}
+
+.footer-bottom p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #777;
+}
+
+@media (max-width: 768px) {
+    .footer-content {
+        flex-direction: column;
+    }
+
+    .footer-section {
+        margin-bottom: 20px;
+    }
+}
+
 /* ===== 13. 清除所有按鈕樣式 ===== */
 #clearAllBtn {
     background-color: var(--btn-danger-bg);
@@ -925,7 +1148,7 @@ textarea:focus {
     border-radius: 8px;
     padding: 20px;
     margin-top: 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 #qrCodeContainer img {
@@ -984,6 +1207,7 @@ textarea:focus {
 
 /* ===== 16. 響應式設計 ===== */
 @media (max-width: 768px) {
+
     .custom-form,
     .remarks-section {
         padding: 0px;
@@ -1037,7 +1261,27 @@ textarea:focus {
         font-size: 1rem;
         min-width: 20px;
     }
+    .custom-form .form-footer {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        margin-top: 15px;
+    }
 
+    .custom-form .form-footer .btn {
+        flex: 1;
+        margin: 0 5px;
+        font-size: 14px;
+        padding: 10px 5px;
+    }
+
+    .custom-form .form-footer .btn-reset {
+        margin-left: 0;
+    }
+
+    .custom-form .form-footer .btn-submit {
+        margin-right: 0;
+    }
     .output-list-table {
         font-size: 0.9rem;
     }
@@ -1046,7 +1290,10 @@ textarea:focus {
         display: none;
     }
 
-    .output-list-table, .output-list-table tbody, .output-list-table tr, .output-list-table td {
+    .output-list-table,
+    .output-list-table tbody,
+    .output-list-table tr,
+    .output-list-table td {
         display: block;
         width: 100% !important;
     }
@@ -1063,7 +1310,7 @@ textarea:focus {
         text-align: right;
         padding: 12px 15px 12px 45%;
         position: relative;
-        border-bottom: 1px solid rgba(0,0,0,0.1);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     }
 
     .output-list-table td:last-child {
@@ -1129,7 +1376,7 @@ textarea:focus {
         font-size: 0.8rem;
     }
 
-     .custom-form .dimension-group {
+    .custom-form .dimension-group {
         flex-wrap: nowrap;
         justify-content: space-between;
     }
@@ -1237,6 +1484,7 @@ textarea:focus {
 }
 
 @media (max-width: 380px) {
+
     .custom-form .size-buttons-container,
     .custom-form .form-footer {
         flex-direction: column;
@@ -1296,8 +1544,13 @@ textarea:focus {
 
 /* ===== 18. 動畫效果 ===== */
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .highlight-new-row {
@@ -1320,8 +1573,13 @@ textarea:focus {
 }
 
 @keyframes simpleFadeOut {
-    from { opacity: 0.5; }
-    to { opacity: 0; }
+    from {
+        opacity: 0.5;
+    }
+
+    to {
+        opacity: 0;
+    }
 }
 
 /* ===== 19. 頁面加載動畫 ===== */
@@ -1348,12 +1606,18 @@ textarea:focus {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* ===== 20. 打印樣式 ===== */
 @media print {
+
     .custom-form,
     .btn,
     .form-footer,
