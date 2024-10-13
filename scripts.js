@@ -1,11 +1,15 @@
+// 大圖輸出金額計算機 JavaScript
+// 版本: 2.0
+// 最後更新: 2023-10-13
+
 // 立即執行函數，避免全局變量污染
 (() => {
-    // ===== 全局變量 =====
+    // ===== 1. 全局變量 =====
     let materialsData = []; // 存儲材質資料
     let materialAreaSums = {}; // 追踪每個材質的面積總和
     let clearAllButtonContainer;
 
-    // ===== 初始化模組 =====
+    // ===== 2. 初始化模組 =====
     document.addEventListener('DOMContentLoaded', async function() {
         try {
             await loadMaterialsData();
@@ -22,6 +26,10 @@
         if (pickupDateOption) {
             pickupDateOption.value = '';
         }
+        initializeStoreInfo();
+    });
+
+    function initializeStoreInfo() {
         const storeInfoContent = document.getElementById('storeInfoContent');
         const toggleButton = document.querySelector('#storeInfoHeader .toggle-btn');
         
@@ -49,7 +57,7 @@
                 });
             });
         }
-    });
+    }
 
     async function initializeApp() {
         try {
@@ -69,7 +77,7 @@
         }
     }
 
-    // ===== 材質資料載入模組 =====
+    // ===== 3. 材質資料載入模組 =====
     async function loadMaterialsData() {
         try {
             const response = await fetch('materials.json');
@@ -81,7 +89,7 @@
         }
     }
 
-    // ===== 事件處理模組 =====
+    // ===== 4. 事件處理模組 =====
     function initializeEventHandlers() {
         document.querySelector('.btn-add-dimension').addEventListener('click', handleAddDimension);
         document.getElementById('calculatorForm').addEventListener('submit', handleFormSubmission);
@@ -113,6 +121,7 @@
 
         initializePickupDateListener();
     }
+
     function handleRemoveDimension(event) {
         const dimensionContainer = document.getElementById('dimensionContainer');
         if (dimensionContainer.children.length > 1) {
@@ -170,7 +179,7 @@
         }
     }    
 
-    // ===== 材質選擇模組 =====
+    // ===== 5. 材質選擇模組 =====
     const MaterialSelect = (function () {
         const DELIMITER = '+';
         let selectedIndex = -1;
@@ -366,7 +375,7 @@
         return { init };
     })();
 
-    // ===== 尺寸組管理模組 =====
+    // ===== 6. 尺寸組管理模組 =====
     function handleAddDimension() {
         manageDimensionGroups('add');
     }
@@ -388,8 +397,8 @@
         group.className = 'dimension-group mb-3 d-flex align-items-center';
         group.innerHTML = `
             <span class="dimension-number"></span>
-            <input type="number" class="form-control length-input" placeholder="長度 (cm)" value="${length}" required step="0.1" min="0.1">
-            <input type="number" class="form-control width-input" placeholder="寬度 (cm)" value="${width}" required step="0.1" min="0.1">
+            <input type="number" class="form-control length-input" placeholder="長(cm)" value="${length}" required step="0.1" min="0.1">
+            <input type="number" class="form-control width-input" placeholder="寬(cm)" value="${width}" required step="0.1" min="0.1">
             <input type="number" class="form-control quantity-input" placeholder="數量" required min="1">
             <button type="button" class="btn btn-danger btn-remove-dimension" aria-label="刪除尺寸組">
                 <i class="fa fa-trash" aria-hidden="true"></i>
@@ -399,14 +408,12 @@
         const dimensionContainer = document.getElementById('dimensionContainer');
         dimensionContainer.appendChild(group);
     
-        // 將容器滾動到最底部，顯示最新的尺寸組
         setTimeout(() => {
             dimensionContainer.scrollTop = dimensionContainer.scrollHeight;
-        }, 100); // 加入少量延遲，確保新增的元素已被插入 DOM
+        }, 100);
     
         return group;
     }
-    
 
     function updateGroupSelection() {
         const selectGroup = document.getElementById('selectGroup');
@@ -428,7 +435,7 @@
         });
     }
 
-    // ===== 表單提交模組 =====
+    // ===== 7. 表單提交模組 =====
     function initializeFormSubmission() {
         const form = document.getElementById('calculatorForm');
         if (form) {
@@ -442,7 +449,7 @@
         const material = document.querySelector('.material-select-input').value;
 
         if (!material) {
-            alert('請選擇有效的材質！');
+            showCustomAlert('請選擇有效的材質！', '錯誤');
             return;
         }
 
@@ -450,18 +457,18 @@
         let materialDiscountPrice = getMaterialPrice(material, true);
 
         if (materialPrice === 0) {
-            alert(`錯誤：無效的材質 "${material}"。請選擇下拉式選單中的材質。`);
+            showCustomAlert(`錯誤：無效的材質 "${material}"。請選擇下拉式選單中的材質。`, '錯誤');
             return;
         }
 
         const dimensions = getDimensions();
         if (!validateDimensions(dimensions)) {
-            alert('請填寫有效的尺寸和數量！');
+            showCustomAlert('請填寫有效的尺寸和數量！', '錯誤');
             return;
         }
 
         if (dimensions.length === 0) {
-            alert('請至少添加一組尺寸和數量！');
+            showCustomAlert('請至少添加一組尺寸和數量！', '錯誤');
             return;
         }
 
@@ -499,7 +506,7 @@
         updateDimensionNumbers();
     }
 
-    // ===== 材質價格計算模組 =====
+    // ===== 8. 材質價格計算模組 =====
     function getBaseMaterialName(material) {
         return material.replace(/\+(裁小模|輪廓裁型|合成板裁型)$/, '');
     }
@@ -553,7 +560,7 @@
         );
     }
 
-    // ===== 表格操作模組 =====
+    // ===== 9. 表格操作模組 =====
     function addRowToTable(material, dimension, totalAmount, isTrimChecked) {
         const tableBody = document.getElementById('resultTable').querySelector('tbody');
         const newRow = document.createElement('tr');
@@ -689,7 +696,7 @@
         });
     }
 
-    // ===== 工具函數模組 =====
+    // ===== 10. 工具函數模組 =====
     function initializeTooltips() {
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         tooltipTriggerList.forEach(tooltipTriggerEl => {
@@ -725,7 +732,7 @@
         });
     }    
 
-    // ===== 總計更新模組 =====
+    // ===== 11. 總計更新模組 =====
     function updateTotals() {
         const rows = document.querySelectorAll('#resultTable tbody tr');
         let subtotal = 0;
@@ -755,7 +762,7 @@
         }
     }
 
-    // ===== 尺寸選擇模態框模組 =====
+    // ===== 12. 尺寸選擇模態框模組 =====
     function initializeSizeModal() {
         const sizeModal = document.getElementById('sizeModal');
         if (sizeModal) {
@@ -796,7 +803,7 @@
         });
     }
 
-    // ===== 備註和清除功能模組 =====
+    // ===== 13. 備註和清除功能模組 =====
     function handleClearAll() {
         if (confirm('確定要清除所有項目嗎？此操作無法撤銷。')) {
             const tableBody = document.getElementById('resultTable').querySelector('tbody');
@@ -812,7 +819,7 @@
         try {
             const tableRows = document.querySelectorAll('#resultTable tbody tr');
             if (tableRows.length === 0) {
-                alert('輸出清單目前沒有內容。請先添加項目到清單中。');
+                showCustomAlert('印刷清單目前沒有內容。請先添加項目到清單中。', '錯誤');
                 return;
             }
     
@@ -821,7 +828,7 @@
             showOutputModal(outputContent, remarksContent);
         } catch (error) {
             console.error('處理備註提交時發生錯誤:', error);
-            alert('處理備註時發生錯誤。請檢查控制台以獲取更多信息。');
+            showCustomAlert('處理備註時發生錯誤。請檢查控制台以獲取更多信息。', '錯誤');
         }
     }
 
@@ -1014,7 +1021,7 @@
         document.getElementById('shippingDetails').style.display = 'none';
     }
 
-    // ===== LINE 分享功能模組 =====
+    // ===== 14. LINE 分享功能模組 =====
     function initializeLineButtons() {
         const sendToLineBtn = document.getElementById('sendToLineBtn');
         if (sendToLineBtn) {
@@ -1029,7 +1036,7 @@
             const lineUrl = `https://line.me/R/oaMessage/@vcprint/?${content}`;
             window.open(lineUrl, '_blank');
         } else {
-            alert('沒有可發送的內容');
+            showCustomAlert('沒有可發送的內容', '錯誤');
         }
     }
 
@@ -1041,16 +1048,15 @@
         const modalContent = document.getElementById('modalContent');
         if (modalContent && modalContent.textContent.trim() !== '') {
             navigator.clipboard.writeText(modalContent.textContent).then(() => {
-                alert('報價內容已成功複製到剪貼板！請將內容貼上到官方 LINE 聊天室。');
+                showCustomAlert('報價內容已成功複製到剪貼板！請將內容貼上到官方 LINE 聊天室。', '成功');
             }).catch(err => {
                 console.error('複製失敗:', err);
-                alert('複製失敗，請手動選擇並複製內容。');
+                showCustomAlert('複製失敗，請手動選擇並複製內容。', '錯誤');
             });
         } else {
-            alert('沒有可複製的內容');
+            showCustomAlert('沒有可複製的內容', '錯誤');
         }
     }
-
 
     function initializeModal() {
         const generateQRBtn = document.getElementById('generateQRBtn');
@@ -1074,20 +1080,15 @@
     }
     
     function formatQRContent(content) {
-        // 如果內容是純文本，可以考慮將其轉換為 URL
-        // 例如，使用 data URI 方案
         const encodedContent = encodeURIComponent(content);
         return `https://example.com/view?data=${encodedContent}`;
-        
-        // 或者，如果您希望直接打開文本，可以使用：
-        // return `data:text/plain;charset=utf-8,${encodedContent}`;
     }
 
     function generateQRCode(content, element) {
-        const qr = qrcode(0, 'M'); // 使用 'M' 級別的錯誤修正
+        const qr = qrcode(0, 'M');
         qr.addData(content);
         qr.make();
-        element.innerHTML = qr.createImgTag(5, 10); // 5 是每個模塊的大小，10 是邊距
+        element.innerHTML = qr.createImgTag(5, 10);
     }
 
     function showQRCodes(content) {
@@ -1170,7 +1171,14 @@
         return content.substr(0, maxLength) + '...';
     }
 
-    // ===== 公開 API =====
+    function showCustomAlert(message, title = '提示') {
+        const alertModal = new bootstrap.Modal(document.getElementById('customAlertModal'));
+        document.getElementById('customAlertModalLabel').textContent = title;
+        document.getElementById('customAlertMessage').textContent = message;
+        alertModal.show();
+    }
+
+    // ===== 15. 公開 API =====
     window.fillExistingGroup = function(length, width, selectedGroupIndex) {
         const selectedGroup = document.querySelectorAll('.dimension-group')[selectedGroupIndex];
         if (selectedGroup) {
